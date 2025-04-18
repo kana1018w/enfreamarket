@@ -1,0 +1,41 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block header%}
+<div class="container d-flex justify-content-between align-items-center py-2">
+    <div class="logo-area">
+      <a href="{% url 'freamarket:index' %}">
+        <img src="{% static 'img/header_logo.png' %}" alt="園フリマロゴ" class="header-logo">
+      </a>
+    </div>
+    <nav class="navbar navbar-expand">
+      <ul class="navbar-nav d-flex flex-row">
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:mypage' %}">マイページ</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'freamarket:sell' %}">出品</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'freamarket:favorite_list' %}">気になるリスト</a></li>
+          <li class="nav-item"><a class="btn btn-logout-action" href="{% url 'accounts:logout' %}">ログアウト</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">ログイン</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:signup' %}">新規登録</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+</div>
+{%endblock%}
+{%block content%}
+<div class="card-wrapper">
+    <div class="card container">
+      <!-- ヘッダー（戻る + タイトル） -->
+        <div class="card-header d-flex align-items-center position-relative">
+            <a href="#" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a> <!-- 戻る or パンくず：子テンプレートで上書き -->
+            <h2 class="card-title mx-auto">{% block page_title %}{% endblock %}</h2> <!-- mx-auto 左右マージンが自動になり、タイトル中央寄せ -->
+        </div>
+    
+        <!-- コンテンツ -->
+        <div class="card-content">
+            {% block body_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{%endblock%}

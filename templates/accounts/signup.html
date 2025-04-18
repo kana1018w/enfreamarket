@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
-{% load static %}
+{%extends 'base.html'%}
+{%load static%}
 
-{%block header %}
+{%block header%}
 <div class="container d-flex justify-content-between align-items-center py-2">
     <div class="logo-area">
       <a href="{% url 'freamarket:index' %}">
@@ -9,15 +9,14 @@
       </a>
     </div>
 </div>
-{% endblock %}
-
-{% block content %}
+{%endblock%}
+{%block content%}
 <div class="container mt-5">
     <div class="row justify-content-center ">
         <div class="col-md-6"> 
             <div class="card login-card shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="text-center mb-4 login-title">ログイン</h2>
+                    <h2 class="text-center mb-4 login-title">新規アカウント登録</h2>
 
                     {# ここにエラーメッセージ表示エリアを設けることもできます #}
                     {% if form.errors %}
@@ -32,7 +31,8 @@
                         </div>
                         {% endfor %}
                     {% endif %}
-                    <form method="post">
+                    <p>フォーム表示するよ<p>
+                    <!-- <form method="post">
                         {% csrf_token %}
                         <div class="form-group mb-3">
                             <label for="id_username" class="form-label">メールアドレス</label>
@@ -45,23 +45,14 @@
                             <input type="password" name="password" class="form-control login-input" id="id_password" placeholder="パスワード" required>
                         </div>
                         <button type="submit" class="btn btn-primary-action btn-block w-100">ログイン</button>
-                    </form>
+                    </form> -->
 
                     <hr class="my-4"> <!-- 分割線 -->
                     <div class="text-center">
-                        <a href="{% url 'accounts:signup' %}" class="link-subtle">アカウントを新規登録する</a>
+                        <a href="{% url 'accounts:login' %}" class="link-subtle">ログイン画面はこちら</a>
                     </div>
                 </div>
             </div>
-
-             <!-- ここからbuttontest -->
-             <div>
-                <hr class="my-4">
-                <button type="button" class="btn btn-accent-action">購入意思表示を送る</button>
-                <button type="submit" class="btn btn-secondary-action">コメント送信</button>
-                <button type="submit" class="btn btn-danger-action">削除</button>
-             </div>
-             <!-- ここまでbuttontest -->
         </div>
     </div>
 </div>

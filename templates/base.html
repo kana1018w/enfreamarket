@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,9 +7,24 @@
 
     <title>{% block title %}園フリマ{% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/buttons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cards.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-    {% block content %}{% endblock %}
+<body class="site-body">
+    <header class="site-header">
+        {%block header %}{% endblock %} 
+        <!-- login , signup はロゴのみ -->
+         <!--その他はヘッダー全体 main_base.htmlで上書き -->
+    </header>      
+    <main class="site-main container" >
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="footer-content container">
+            <a class="nav-link" href="{% url 'freamarket:terms' %}">ご利用のルール</a>
+        </div>
+        </footer>
 </body>
 </html>

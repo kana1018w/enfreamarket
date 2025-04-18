@@ -1,0 +1,28 @@
+/* 規約 */
+.terms-content{
+    background-color: rgba(255, 255, 255, 0.9); /* ← 半透明にして背景を見せる */
+    max-width: 1280px;
+    margin: 20px auto; 
+    padding: 20px; 
+    border: 1px solid #eee; 
+    border-radius: 8px;
+}
+
+.terms-content h3 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-top: 10px;
+  }
+  
+.terms-content ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.terms-content li {
+    margin-bottom: 10px;
+}
+
+.terms-content strong {
+    color: #D5442C; /* 強調文字を赤色に */
+}   

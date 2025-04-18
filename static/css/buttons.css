@@ -1,0 +1,71 @@
+/* ===============================
+   共通設定（全ボタンに適用するベース）
+================================ */
+button {
+    font-family: inherit;
+    font-size: 1rem; /* ← 文字サイズ（相対的な単位） */
+    border-radius: 6px;
+    padding: 10px 16px; /* ← 縦10px、横16pxの余白 */
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+/* ===============================
+   基本アクションボタン（例：ログイン、登録、更新）
+   → サイト全体のキーカラー（ミントグリーン系）を使用
+================================ */
+.btn-primary-action {
+    background-color: #a6cfc8;  /* 明るめのミントグリーン */
+    color: #fff;
+    border: none;
+}
+.btn-primary-action:hover {
+    background-color: #8fc1b8;  /* 濃いめのミントグリーンに変化 */
+    color: #fff;
+}
+
+
+/* ===============================
+   強調アクションボタン（例：購入意思表示、取引開始）
+   → ワンランク強めの色で目立たせる
+================================ */
+.btn-accent-action {
+    background-color: #c9c7e3;  /* 上品な薄紫 */
+    color: #fff;
+    border: none;
+}
+.btn-accent-action:hover {
+    background-color: #b7b4d3;
+    color: #fff;
+}
+
+
+/* ===============================
+   副次的アクションボタン（例：コメント送信、編集など）
+   → 目立ちすぎない、グレー系アウトライン
+================================ */
+.btn-secondary-action {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #555;
+}
+.btn-secondary-action:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+
+/* ===============================
+   注意アクションボタン（例：削除、取引完了）
+   → 削除などユーザーに注意を促すボタン
+================================ */
+.btn-danger-action {
+    background-color: #f8b7b2;  /* 淡い赤 */
+    color: #fff;
+    border: none;
+}
+.btn-danger-action:hover {
+    background-color: #ec9a93;  /* やや濃い赤 */
+    color: #fff;
+}

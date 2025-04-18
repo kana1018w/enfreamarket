@@ -1,0 +1,49 @@
+/* カード全体 */
+.card-wrapper {
+    max-width: 1280px;
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+  
+.card {
+    background-color: rgba(255, 255, 255, 0.9); /* ← 半透明にして背景を見せる */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+}
+
+/* ヘッダー部分（戻る・タイトル） */
+.card-header {
+    background-color: #fff;
+    position: relative;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* タイトル中央寄せ */
+.card-title {
+    font-size: 1.5rem;
+    margin: 0;
+}
+  
+/* 戻るリンク */
+.back-link {
+    position: absolute; left: 0; /* ← 絶対位置：左端に配置 */
+    left: 0;
+    color: #6c879e;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+  
+.back-link:hover {
+    color: #4f657c;
+    text-decoration: underline;
+}
+  
+  /* コンテンツ */
+.card-content {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+  
