@@ -1,14 +1,15 @@
-{% extends 'base.html' %}
+{% extends 'main_base.html' %}
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/terms.css' %}">
 {% endblock %}
-{% block content %}
-<div class="terms-content">
-    <div class="text-center">
-        <h3>園フリマ ご利用のルール</h3>
-    </div>
 
+{% block page_title %}
+ご利用のルール
+{% endblock %}
+
+{% block body_content %}
+<div class="terms-content">
     <p>
         園フリマは、同じ園に通う保護者同士が安心して園用品を譲り合える場です。
         気持ちの良いお取引のために、以下のルールを守ってご利用ください。

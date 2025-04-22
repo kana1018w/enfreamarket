@@ -4,6 +4,18 @@ from django.shortcuts import render
 def index(request):
     return render(request, 'freamarket/index.html')
 
+# マイページ
+def mypage(request):
+    return render(request, 'freamarket/mypage.html')
+
+# 出品
+def sell(request):
+    return render(request, 'freamarket/sell.html')
+
+# 気になるリスト
+def favorite_list(request): 
+    return render(request, 'freamarket/favorite_list.html')
+
 # ご利用規約
 def terms(request):
     return render(request, 'freamarket/terms.html')
