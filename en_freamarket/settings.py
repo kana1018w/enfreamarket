@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'en_freamarket',
     'accounts',
+    'kindergartens',
 ]
 
 MIDDLEWARE = [
