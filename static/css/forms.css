@@ -1,0 +1,20 @@
+ /* select要素の高さを他のinput要素(.login-input)と揃えるための調整 */
+select.login-input {
+  height: calc(1.5em + 0.75rem + 2px);
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  width: 100%;
+  color: #495057;
+  }
+
+.errorlis{
+  padding: 0%;
+}
+
+.form-error {
+ color: red;
+  margin: 0;
+  font-size: 0.8rem;
+  list-style: none;
+  padding: 0;
+}

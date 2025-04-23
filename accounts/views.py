@@ -1,4 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+from .models import User
+from django.contrib.auth import login as auth_login # 登録後に自動ログインさせる場合に使う (任意)
+from django.contrib import messages # メッセージを表示する場合に使う
+
+
+
 
 # Create your views here.
 def login(request):
@@ -8,4 +15,60 @@ def logout(request):
     return render(request, 'accounts/logout.html')
 
 def signup(request):
-    return render(request, 'accounts/signup.html')
+    """
+    アカウント新規登録ビュー
+    """
+    if request.method == 'POST':
+        # 送信されたデータ (request.POST) を使ってフォームをインスタンス化
+        form = SignUpForm(request.POST)
+
+        # フォームのバリデーションを実行 (.is_valid() を呼ぶと、forms.pyのcleanメソッドなどが実行される)
+        if form.is_valid():
+            # バリデーション成功！ cleaned_data に検証済みのデータが入っている
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            name = form.cleaned_data['name']
+            display_name = form.cleaned_data.get('display_name') # 任意入力なので .get() を使う
+            kindergarten = form.cleaned_data['kindergarten']
+
+            try:
+                # User.objects (CustomUserManager) の create_user メソッドを呼び出してユーザーを作成
+                # ※ forms.py でバリデーション済みなので、基本的にはここでエラーは起きにくい想定
+                user = User.objects.create_user(
+                    email=email,
+                    password=password, # create_user内でハッシュ化される
+                    name=name,
+                    kindergarten=kindergarten,
+                    display_name=display_name # display_nameも渡す
+                )
+
+                # 登録成功後の処理 
+                auth_login(request, user)
+
+                # このメッセージは、リダイレクト先のテンプレートで表示できます。
+                messages.success(request, 'アカウント登録が完了しました。ご利用のルールをご確認の上、サービスをご利用ください。')
+                return redirect('freamarket:index')
+
+            except ValueError as e:
+                # models.py の create_user 内で発生した ValueError をキャッチした場合
+                # (例: 万が一、フォームでチェックしきれなかった必須項目漏れなど)
+                form.add_error(None, f"登録エラーが発生しました: {e}") # フォーム全体のエラーとして表示
+            except Exception as e:
+                # その他の予期せぬエラーが発生した場合
+                # (実際には、エラー内容をログに記録するなどの処理が推奨されます)
+                print(f"予期せぬエラー: {e}") # 開発中はコンソールに出力
+                form.add_error(None, '登録中に予期せぬエラーが発生しました。しばらくしてから再度お試しください。')
+
+    # GETリクエストの場合 (最初にページを開いた場合)
+    else:
+        form = SignUpForm()
+
+    # GETリクエストの場合、またはPOSTでバリデーション失敗した場合に実行される
+    # テンプレートにフォームオブジェクトを渡してレンダリング
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/signup.html', context)
+
+def mypage(request):
+    return render(request, 'accounts/mypage.html')

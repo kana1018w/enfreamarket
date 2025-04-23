@@ -5,7 +5,6 @@ app_name = 'freamarket'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('mypage/', views.mypage, name='mypage'),
     path('sell/', views.sell, name='sell'),
     path('favorite_list/', views.favorite_list, name='favorite_list'),
     path('terms/', views.terms, name='terms'),

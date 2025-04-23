@@ -4,10 +4,6 @@ from django.shortcuts import render
 def index(request):
     return render(request, 'freamarket/index.html')
 
-# マイページ
-def mypage(request):
-    return render(request, 'freamarket/mypage.html')
-
 # 出品
 def sell(request):
     return render(request, 'freamarket/sell.html')

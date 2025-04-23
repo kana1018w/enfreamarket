@@ -1,5 +1,8 @@
-{%extends 'base.html'%}
-{%load static%}
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
 
 {%block header%}
 <div class="container d-flex justify-content-between align-items-center py-2">
@@ -16,36 +19,39 @@
         <div class="col-md-6"> 
             <div class="card login-card shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="text-center mb-4 login-title">新規アカウント登録</h2>
-
-                    {# ここにエラーメッセージ表示エリアを設けることもできます #}
-                    {% if form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            メールアドレスまたはパスワードが正しくありません。
-                        </div>
-                    {% endif %}
-                    {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
-                            {{ message }}
-                        </div>
+                    <h3 class="text-center mb-4 login-title">新規アカウント登録</h3>
+                        {% if form.non_field_errors %}
+                        <ul class="errorlist nonfield">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
                         {% endfor %}
-                    {% endif %}
-                    <p>フォーム表示するよ<p>
-                    <!-- <form method="post">
+                        </ul>
+                        {% endif %}
+                    <form method="post" novalidate>
                         {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label for="id_username" class="form-label">メールアドレス</label>
-                            {# DjangoのAuthenticationFormを想定したid (id_username)。nameも合わせる #}
-                            <input type="email" name="username" class="form-control login-input" id="id_username" placeholder="登録したメールアドレス" required>
+                        {% for field in form %}
+                        <div class="form-group mb-3"> {# 各フィールドを囲むdiv (mb-3はBootstrapの例) #}
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }} {# フィールド本体 (input, selectなど) をレンダリング #}
+                
+                            {% comment %} フィールドごとのヘルプテキスト {% endcomment %}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                
+                            {% comment %} フィールドごとのエラー {% endcomment %}
+                            {% if field.errors %}
+                                <ul class="errorlis">
+                                {% for error in field.errors %}
+                                    <li class="form-error">{{ error }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
-                        <div class="form-group mb-4">
-                            <label for="id_password" class="form-label">パスワード</label>
-                            {# DjangoのAuthenticationFormを想定したid (id_password)。nameも合わせる #}
-                            <input type="password" name="password" class="form-control login-input" id="id_password" placeholder="パスワード" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary-action btn-block w-100">ログイン</button>
-                    </form> -->
+                        {% endfor %}                
+                        <button type="submit" class="btn btn-primary-action btn-block w-100">登録</button>
+                    </form>
+                    
 
                     <hr class="my-4"> <!-- 分割線 -->
                     <div class="text-center">
