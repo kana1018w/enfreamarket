@@ -1,18 +1,54 @@
 from django.shortcuts import render, redirect
-from .forms import SignUpForm
+from .forms import SignUpForm, EmailAuthenticationForm
 from .models import User
 from django.contrib.auth import login as auth_login # 登録後に自動ログインさせる場合に使う (任意)
+from django.contrib.auth import logout as auth_logout
 from django.contrib import messages # メッセージを表示する場合に使う
+from django.contrib.auth.decorators import login_required
 
 
 
 
 # Create your views here.
 def login(request):
-    return render(request, 'accounts/login.html')
+    """
+    ログインビュー
+    """
+    # ログイン済みユーザーがアクセスしたらトップページへリダイレクト (任意)
+    if request.user.is_authenticated:
+        return redirect('freamarket:index') # トップページのURL名
 
+    if request.method == 'POST':
+        # カスタマイズした EmailAuthenticationForm を使用
+        form = EmailAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            # 認証成功
+            # form.get_user() で認証されたユーザーオブジェクトを取得
+            user = form.get_user()
+            # ログイン状態にする
+            auth_login(request, user)
+            messages.success(request, f'ようこそ{user.display_name or user.name}さん、ログインしました。')
+            return redirect('freamarket:index') # トップページのURL名
+        # else: バリデーション失敗 -> エラー付きフォームが render される
+    else:
+        # GETリクエスト -> 空のフォームを表示
+        form = EmailAuthenticationForm()
+
+    context = {'form': form}
+    return render(request, 'accounts/login.html', context)
+
+@login_required
 def logout(request):
-    return render(request, 'accounts/logout.html')
+    """
+    ログアウトビュー
+    """
+    # POSTリクエストのみ受け付ける (CSRF対策のため推奨)
+    if request.method == 'POST':
+        auth_logout(request)
+        messages.info(request, 'ログアウトしました。')
+        return redirect('accounts:login')
+    else:
+        return redirect('freamarket:index')
 
 def signup(request):
     """

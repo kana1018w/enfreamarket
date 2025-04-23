@@ -78,6 +78,34 @@ body.site-body {
 }
 
 
+/* 通知メッセージ */
+.alert {
+    display: flex;
+    background-color: #e6f4f1;
+    width: fit-content;
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    color: #333;
+    gap: 0.5rem;
+    line-height: 1;
+}
+
+.alert-success {
+    border-left: 5px solid #5CBD9D;
+}
+
+.alert-error {
+    border-left: 5px solid #E74C3C;
+}
+
+.alert-warning {
+    border-left: 5px solid #F29C33;
+}
+
+.alert-info {
+    border-left: 5px solid #3998DB;
+}
 
 /* リンク */
 a.link-subtle {

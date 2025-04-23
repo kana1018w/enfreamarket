@@ -12,7 +12,7 @@ select.login-input {
 }
 
 .form-error {
- color: red;
+  color: red;
   margin: 0;
   font-size: 0.8rem;
   list-style: none;

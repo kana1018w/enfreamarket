@@ -3,6 +3,7 @@ from django import forms
 from .models import User 
 from kindergartens.models import Kindergarten
 from django.db import models 
+from django.contrib.auth.forms import AuthenticationForm
 
 # Kindergartenモデルもインポート（実際のパスに合わせてください）
 try:
@@ -13,6 +14,35 @@ except ImportError:
         name = models.CharField(max_length=100)
         auth_code = models.CharField(max_length=50)
         objects = models.Manager() # objectsマネージャーが必要
+
+class EmailAuthenticationForm(AuthenticationForm):
+    """
+    メールアドレス認証用のログインフォーム
+    """
+    # 標準の username フィールドを上書きして EmailField にする
+    username = forms.EmailField(
+        label="メールアドレス",
+        widget=forms.EmailInput(attrs={'autofocus': True, 'class': 'form-control login-input', 'placeholder': '登録したメールアドレス'}),
+        error_messages={'required': 'メールアドレスを入力してください。'}
+    )
+
+    password = forms.CharField(
+        label="パスワード",
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control login-input', 'placeholder': 'パスワード'}),
+        error_messages={'required': 'パスワードを入力してください。'}
+    )
+
+    # error_messages をカスタマイズする場合 (任意)
+    error_messages = {
+        'invalid_login': "メールアドレスまたはパスワードが正しくありません。",
+        'inactive': "このアカウントは無効です。",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        super().__init__(request=request, *args, **kwargs)
+        # パスワードフィールドのラベルなどを変更したい場合 (任意)
+        # self.fields['password'].label = "パスワード"
 
 class SignUpForm(forms.Form):
     """
