@@ -106,5 +106,37 @@ def signup(request):
     }
     return render(request, 'accounts/signup.html', context)
 
+@login_required
 def mypage(request):
-    return render(request, 'accounts/mypage.html')
+    """
+    マイページ表示ビュー
+    """
+    # ログイン中のユーザーオブジェクトは request.user で取得できる
+    user = request.user
+
+    # テンプレートに渡すデータ (コンテキスト) を作成
+    context = {
+        'user': user,
+    }
+
+    return render(request, 'accounts/mypage.html', context)
+
+
+@login_required
+def my_listings(request):
+    return render(request, 'accounts/my_listings.html')
+
+@login_required
+def my_intents_given(request):
+    return render(request, 'accounts/my_intents_given.html')
+@login_required
+def my_intents_received(request):
+    return render(request, 'accounts/my_intents_received.html')
+
+@login_required
+def profile_edit(request):
+    return render(request, 'accounts/profile_edit.html')
+
+@login_required
+def password_change(request):
+    return render(request, 'accounts/password_change.html')

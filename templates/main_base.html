@@ -41,7 +41,7 @@
       <!-- ヘッダー（戻る + タイトル） -->
         <div class="card-header d-flex align-items-center position-relative">
             <a href="javascript:history.back()" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a> <!-- 戻る or パンくず：子テンプレートで上書き -->
-            <h2 class="card-title mx-auto">{% block page_title %}{% endblock %}</h2> <!-- mx-auto 左右マージンが自動になり、タイトル中央寄せ -->
+            <h3 class="card-title mx-auto">{% block page_title %}{% endblock %}</h3> <!-- mx-auto 左右マージンが自動になり、タイトル中央寄せ -->
         </div>
     
         <!-- コンテンツ -->
