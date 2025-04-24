@@ -20,7 +20,7 @@
 /* アクティブメニュー */
 .custom-active {
     color: #4A8A85;  /* ミントより少し濃いグリーン系文字色 */
-    font-weight: 400;
+    font-weight: bold;
     border-bottom: 2px solid #A7DCD5;
 }
 
@@ -31,9 +31,11 @@
 
 /* マイページ情報 */
 dt { 
+    padding: .375rem .75rem;
+    font-weight: normal;
     text-align: right;
 }
 
 dd { 
-    text-align: center;
+    text-align: left;
 }

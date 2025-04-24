@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect
-from .forms import SignUpForm, EmailAuthenticationForm, NameChangeForm
+from django.urls import reverse_lazy
+from .forms import SignUpForm, EmailAuthenticationForm, NameChangeForm, DisplayNameChangeForm, EmailChangeForm, CustomPasswordChangeForm
 from .models import User
 from django.contrib.auth import login as auth_login, logout as auth_logout, update_session_auth_hash 
 from django.contrib import messages # メッセージを表示する場合に使う
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+
 
 
 
@@ -162,12 +168,64 @@ def profile_name_edit(request):
 
 @login_required
 def profile_display_name_edit(request):
-    return render(request, 'accounts/display_name_edit.html')
+    """
+    表示名変更ビュー
+    """
+    # 更新対象のユーザーはリクエストから取得
+    user = request.user
+
+    if request.method == 'POST':
+        # POSTリクエストの場合: 送信されたデータと、更新対象のユーザーインスタンスでフォームを初期化
+        form = DisplayNameChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '表示名を変更しました。')
+            # 変更後はマイページなどにリダイレクト
+            return redirect('accounts:mypage') # マイページのURL名
+        # else: バリデーション失敗 -> エラー付きフォームが render される
+    else:
+        form = DisplayNameChangeForm(instance=user)
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'accounts/display_name_edit.html', context)
 
 @login_required
-def profile_mailaddress_edit(request):
-    return render(request, 'accounts/mailaddress_edit.html')
+def profile_email_edit(request):
+    """
+    メールアドレス変更ビュー
+    """
+    user = request.user
+    if request.method == 'POST':
+        form = EmailChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'メールアドレスを変更しました。')
+            return redirect('accounts:mypage')
+    else:
+        form = EmailChangeForm(instance=user)
 
-@login_required
-def profile_password_edit(request):
-    return render(request, 'accounts/password_edit.html')
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'accounts/email_edit.html', context)
+
+
+class ProfilePasswordEditView(LoginRequiredMixin, PasswordChangeView): # ← クラスとして定義し、継承する
+    """パスワード変更ビュー"""
+    # クラス属性として定義
+    form_class = CustomPasswordChangeForm
+    template_name = 'accounts/password_edit.html'
+    success_url = reverse_lazy('accounts:mypage')
+
+    # メソッドとして定義
+    def form_valid(self, form):
+        # 親クラスの form_valid を呼び出す前にメッセージを設定することも可能
+        messages.success(self.request, 'パスワードを変更しました。')
+        # パスワード変更後にセッションを維持
+        update_session_auth_hash(self.request, form.user)
+        # 親クラスの form_valid を呼び出してリダイレクト処理などを行わせる
+        return super().form_valid(form)

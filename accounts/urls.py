@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import ProfilePasswordEditView
 
 app_name = 'accounts'
 
@@ -14,6 +15,6 @@ urlpatterns = [
     path('mypage/intents/received/',views.my_intents_received, name='my_intents_received'),
     path('profile/name/edit/', views.profile_name_edit, name='profile_name_edit'),
     path('profile/display_name/edit/', views.profile_display_name_edit, name='profile_display_name_edit'),
-    path('profile/mailaddress/edit/', views.profile_mailaddress_edit, name='profile_mailaddress_edit'),
-    path('profile/password/edit/', views.profile_password_edit, name='profile_password_edit'),
+    path('profile/email/edit/', views.profile_email_edit, name='profile_email_edit'),
+    path('profile/password/edit/', ProfilePasswordEditView.as_view(), name='profile_password_edit'),
 ]

@@ -3,7 +3,7 @@ from django import forms
 from .models import User 
 from kindergartens.models import Kindergarten
 from django.db import models 
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 # Kindergartenモデルもインポート（実際のパスに合わせてください）
 try:
@@ -181,3 +181,91 @@ class NameChangeForm(forms.ModelForm):
         self.fields['name'].error_messages = {
             'required': '名前を入力してください。'
         }
+
+class DisplayNameChangeForm(forms.ModelForm):
+    """
+    ユーザーの表示名変更用フォーム
+    """
+    class Meta:
+        model = User       # 対象モデルは User
+        fields = ('display_name',) # 編集するフィールド
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['display_name'].label = '変更後の表示名'
+        self.fields['display_name'].required = True
+        self.fields['display_name'].widget = forms.TextInput(
+            attrs={
+                'class': 'form-control login-input',
+            }
+        )
+        # 必須エラーメッセージをカスタマイズ (任意)
+        self.fields['display_name'].error_messages = {
+            'required': '表示名を入力してください。'
+        }
+
+class EmailChangeForm(forms.ModelForm):
+    """
+    メールアドレス変更用フォーム
+    """
+    class Meta:
+        model = User
+        fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].label = '変更後のメールアドレス'
+        self.fields['email'].required = True
+        self.fields['email'].widget = forms.EmailInput(
+            attrs={
+                'class': 'form-control login-input',
+            }
+        )
+        self.fields['email'].error_messages = {
+            'required': 'メールアドレスを入力してください。',
+            'invalid': '有効なメールアドレス形式で入力してください。'
+        }
+
+    def clean_email(self):
+        """
+        メールアドレスのユニークチェック（自分自身を除く）
+        """
+        email = self.cleaned_data.get('email')
+        # self.instance は編集対象のユーザーオブジェクト
+        current_user_pk = self.instance.pk
+
+        # 入力されたemailを持ち、かつ自分自身 *以外* のユーザーが存在するかチェック
+        if email and User.objects.filter(email=email).exclude(pk=current_user_pk).exists():
+            raise forms.ValidationError("このメールアドレスは既に使用されています。")
+        return email
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    """
+    パスワード変更フォーム(PasswordChangeFormを継承、デザインを統一するため再定義)
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # --- 各フィールドのウィジェットにCSSクラスなどを追加 ---
+        self.fields['old_password'].label = "現在のパスワード"
+        self.fields['old_password'].widget = forms.PasswordInput(
+            attrs={
+                'class': 'form-control login-input',
+                'placeholder': '現在のパスワードを入力'
+            }
+        )
+        self.fields['new_password1'].label = "新しいパスワード"
+        self.fields['new_password1'].widget = forms.PasswordInput(
+            attrs={
+                'class': 'form-control login-input',
+                'placeholder': '新しいパスワード (8文字以上)'
+            }
+        )
+        self.fields['new_password2'].label = "新しいパスワード（確認）"
+        self.fields['new_password2'].widget = forms.PasswordInput(
+            attrs={
+                'class': 'form-control login-input',
+                'placeholder': '確認のためもう一度入力'
+            }
+        )
+
+        # エラーメッセージは標準を継承
