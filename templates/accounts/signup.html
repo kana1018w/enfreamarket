@@ -41,7 +41,7 @@
                 
                             {% comment %} フィールドごとのエラー {% endcomment %}
                             {% if field.errors %}
-                                <ul class="errorlis">
+                                <ul class="errorlist">
                                 {% for error in field.errors %}
                                     <li class="form-error">{{ error }}</li>
                                 {% endfor %}

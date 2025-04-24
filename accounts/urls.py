@@ -12,7 +12,8 @@ urlpatterns = [
     path('mypage/listings/',views.my_listings, name='my_listings'),
     path('mypage/intents/given/',views.my_intents_given, name='my_intents_given'),
     path('mypage/intents/received/',views.my_intents_received, name='my_intents_received'),
-    path('profile_edit/', views.profile_edit, name='profile_edit'),
-    path('password_change/', views.password_change, name='password_change'),
-
+    path('profile/name/edit/', views.profile_name_edit, name='profile_name_edit'),
+    path('profile/display_name/edit/', views.profile_display_name_edit, name='profile_display_name_edit'),
+    path('profile/mailaddress/edit/', views.profile_mailaddress_edit, name='profile_mailaddress_edit'),
+    path('profile/password/edit/', views.profile_password_edit, name='profile_password_edit'),
 ]

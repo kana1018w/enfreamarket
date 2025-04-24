@@ -7,12 +7,13 @@ select.login-input {
   color: #495057;
   }
 
-.errorlis{
+.errorlist{
   padding: 0%;
 }
 
 .form-error {
   color: red;
+  text-align: left;
   margin: 0;
   font-size: 0.8rem;
   list-style: none;

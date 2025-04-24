@@ -41,8 +41,8 @@ body.site-body {
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: #e6f4f1;
-    color: #2c4a45;
+    background-color: #F6FCFB;  /* かなり淡いミント系 */
+    color: #4A8A85;             /* 文字色はそのままキープ */
 }
 
 /* メイン */

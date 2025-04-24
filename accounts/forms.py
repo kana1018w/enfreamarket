@@ -159,4 +159,25 @@ class SignUpForm(forms.Form):
 
         return cleaned_data 
 
-    
+class NameChangeForm(forms.ModelForm):
+    """
+    ユーザーの名前変更用フォーム
+    """
+    class Meta:
+        model = User       # 対象モデルは User
+        fields = ('name',) # 編集するフィールド
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # フィールドのラベルやウィジェットをカスタマイズ
+        self.fields['name'].label = '変更後の名前'
+        self.fields['name'].required = True # 名前の入力を必須にする
+        self.fields['name'].widget = forms.TextInput(
+            attrs={
+                'class': 'form-control login-input',
+            }
+        )
+        # 必須エラーメッセージをカスタマイズ (任意)
+        self.fields['name'].error_messages = {
+            'required': '名前を入力してください。'
+        }

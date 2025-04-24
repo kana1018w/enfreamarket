@@ -17,24 +17,23 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
 
+/* アクティブメニュー */
+.custom-active {
+    color: #4A8A85;  /* ミントより少し濃いグリーン系文字色 */
+    font-weight: 400;
+    border-bottom: 2px solid #A7DCD5;
+}
+
+.list-group-item-action:hover {
+    background-color: #F6FCFB;  /* かなり淡いミント系 */
+    color: #4A8A85;             /* 文字色はそのままキープ */
+}
+
 /* マイページ情報 */
 dt { 
-    font-weight: bold;
     text-align: right;
 }
 
 dd { 
     text-align: center;
-}
-
-/* マイページリンク */
-.mypage-links {
-    text-align: center;
-}
-.mypage-links a {
-    margin-right: 1rem; /* 右にスペースを追加 */
-  }
-  
-.mypage-links a:last-child {
-    margin-right: 0; /* 最後のリンクだけ余分なスペースをなくす */
 }

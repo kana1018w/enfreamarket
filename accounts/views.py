@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
-from .forms import SignUpForm, EmailAuthenticationForm
+from .forms import SignUpForm, EmailAuthenticationForm, NameChangeForm
 from .models import User
-from django.contrib.auth import login as auth_login # 登録後に自動ログインさせる場合に使う (任意)
-from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login, logout as auth_logout, update_session_auth_hash 
 from django.contrib import messages # メッセージを表示する場合に使う
 from django.contrib.auth.decorators import login_required
 
@@ -134,9 +133,41 @@ def my_intents_received(request):
     return render(request, 'accounts/my_intents_received.html')
 
 @login_required
-def profile_edit(request):
-    return render(request, 'accounts/profile_edit.html')
+def profile_name_edit(request):
+    """
+    名前変更ビュー
+    """
+    # 更新対象のユーザーはリクエストから取得
+    user = request.user
+
+    if request.method == 'POST':
+        # POSTリクエストの場合: 送信されたデータと、更新対象のユーザーインスタンスでフォームを初期化
+        form = NameChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            # バリデーション成功: フォームの変更をデータベースに保存
+            form.save()
+            messages.success(request, '名前を変更しました。')
+            # 変更後はマイページなどにリダイレクト
+            return redirect('accounts:mypage') # マイページのURL名
+        # else: バリデーション失敗 -> エラー付きフォームが render される
+    else:
+        form = NameChangeForm(instance=user)
+
+    # GETリクエスト、またはPOSTでバリデーション失敗した場合に実行
+    context = {
+        'form': form,
+    }
+    # 名前変更用のテンプレートをレンダリング
+    return render(request, 'accounts/name_edit.html', context)
 
 @login_required
-def password_change(request):
-    return render(request, 'accounts/password_change.html')
+def profile_display_name_edit(request):
+    return render(request, 'accounts/display_name_edit.html')
+
+@login_required
+def profile_mailaddress_edit(request):
+    return render(request, 'accounts/mailaddress_edit.html')
+
+@login_required
+def profile_password_edit(request):
+    return render(request, 'accounts/password_edit.html')
