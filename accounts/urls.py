@@ -16,5 +16,5 @@ urlpatterns = [
     path('profile/name/edit/', views.profile_name_edit, name='profile_name_edit'),
     path('profile/display_name/edit/', views.profile_display_name_edit, name='profile_display_name_edit'),
     path('profile/email/edit/', views.profile_email_edit, name='profile_email_edit'),
-    path('profile/password/edit/', ProfilePasswordEditView.as_view(), name='profile_password_edit'),
+    path('profile/password/edit/', ProfilePasswordEditView.as_view(), name='profile_password_edit'), # クラスベースビューは呼び出し方が異なる　view.as_view()
 ]
