@@ -37,5 +37,7 @@ dt {
 }
 
 dd { 
+    padding: .375rem .75rem;
+    margin-bottom: 0px;
     text-align: left;
 }

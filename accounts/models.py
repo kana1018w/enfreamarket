@@ -75,7 +75,7 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('スーパーユーザーは is_superuser=True である必要があります。')
 
-        name = extra_fields.get('name')
+        name = extra_fields.pop('name', None )
         if not name:
              raise ValueError('スーパーユーザーには名前が必要です。')
 
@@ -87,9 +87,9 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(
             email=email,
             password=password,
-            name=name,
+            name=name, # popで取り出したnameを渡す
             kindergarten=kindergarten,
-            **extra_fields
+            **extra_fields # popされた後のextra_fieldsを渡す (nameは含まれない)
         )
 
 # カスタムユーザーモデル
@@ -100,7 +100,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         on_delete=models.PROTECT,
         verbose_name='所属園',
         related_name='users',
-        null=True, blank=True # スーパーユーザー用に一時的にNULLを許可する場合はコメント解除
+        # null=True, blank=True # スーパーユーザー用に一時的にNULLを許可する場合はコメント解除
     )
     name = models.CharField('名前', max_length=100) # null=False, blank=False はデフォルト
     display_name = models.CharField('表示名', max_length=50, null=True, blank=True)
@@ -135,6 +135,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name','kindergarten'] 
+
+
+    class Meta:
+        db_table = 'users'
+        verbose_name = 'ユーザー'
+        verbose_name_plural = 'ユーザー'
 
     # --- メソッド ---
     def __str__(self):
