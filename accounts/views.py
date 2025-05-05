@@ -86,9 +86,8 @@ def signup(request):
                 # 登録成功後の処理 
                 auth_login(request, user)
 
-                # このメッセージは、リダイレクト先のテンプレートで表示できます。
                 messages.success(request, 'アカウント登録が完了しました。ご利用のルールをご確認の上、サービスをご利用ください。')
-                return redirect('freamarket:index')
+                return redirect('products:index')
 
             except ValueError as e:
                 # models.py の create_user 内で発生した ValueError をキャッチした場合
@@ -96,9 +95,12 @@ def signup(request):
                 form.add_error(None, f"登録エラーが発生しました: {e}") # フォーム全体のエラーとして表示
             except Exception as e:
                 # その他の予期せぬエラーが発生した場合
-                # (実際には、エラー内容をログに記録するなどの処理が推奨されます)
                 print(f"予期せぬエラー: {e}") # 開発中はコンソールに出力
                 form.add_error(None, '登録中に予期せぬエラーが発生しました。しばらくしてから再度お試しください。')
+
+        else:
+            # フォームが無効な場合 (バリデーションNG)
+            messages.error(request, '入力内容に誤りがあります。内容を確認してください。')
 
     # GETリクエストの場合 (最初にページを開いた場合)
     else:

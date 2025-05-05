@@ -19,3 +19,16 @@ select.login-input {
   list-style: none;
   padding: 0;
 }
+
+/* 商品画像 */
+.image-upload-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.form-img-input{
+  height: auto;
+  border-radius: .25rem;
+  width: 100%;
+}
