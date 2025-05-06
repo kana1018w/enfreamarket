@@ -7,6 +7,7 @@ from django.contrib import messages # メッセージを表示する場合に使
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from products.models import Product, ProductImage
 
 
 
@@ -131,7 +132,29 @@ def mypage(request):
 
 @login_required
 def my_listings(request):
-    return render(request, 'accounts/my_listings.html')
+    """出品した商品一覧ビュー"""
+    # ログイン中のユーザーが出品した商品を取得
+    # Productモデルの user フィールドでフィルター
+    # main_product_image を参照するので select_related でJoinした結果を取得しておく (N+1対策)
+    user_products = Product.objects.filter(user=request.user).select_related(
+        'main_product_image' # メイン画像の情報を一緒に取得
+    ).order_by('-created_at')
+
+    # 商品のステータスに応じてステータスクラスを追加し、テンプレートに渡す
+    for product in user_products:
+        if product.status == Product.Status.FOR_SALE:
+            product.status_class = "status-for-sale"
+        elif product.status == Product.Status.IN_TRANSACTION:
+            product.status_class = "status-in-transaction"
+        elif product.status == Product.Status.SOLD:
+            product.status_class = "status-sold"
+        else:
+            product.status_class = ""
+
+    context = {
+        'products': user_products,
+    }
+    return render(request, 'accounts/my_listings.html', context)
 
 @login_required
 def my_intents_given(request):

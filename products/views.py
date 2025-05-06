@@ -92,6 +92,13 @@ def sell(request):
     context = {'form': form}
     return render(request, 'products/sell.html', context)
 
+# 商品詳細
+def detail(request, pk):
+    return render(request, 'products/detail.html')
+
+# 商品編集
+def edit(request, pk):
+    return render(request, 'products/edit.html')
 
 # 気になるリスト
 def favorite_list(request): 

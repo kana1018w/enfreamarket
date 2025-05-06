@@ -1,0 +1,31 @@
+.list-group-item {
+    border: none; /* デフォルトの枠を消す */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* 下線を追加 */
+  }
+
+.product-title {
+    word-break: break-word;
+}
+
+.item-status-menu {
+    gap: 20px;
+}
+
+.status-label {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: transparent;
+}
+
+.status-for-sale {
+    color: #4A8A85;         /* 濃いミント文字 */
+}
+
+.status-in-transaction {
+    color: #AA7B00;         /* 渋めの黄土色 */
+}
+
+.status-sold {
+    color: #444444;         /* 濃いグレー */
+}
+

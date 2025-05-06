@@ -165,6 +165,6 @@ class Product(models.Model):
         ordering = ['-created_at'] # 新しい順に並べるのをデフォルトにする (任意)
 
     def __str__(self):
-        return f'{self.name} (¥{self.price}) {self.size} / {self.category.name} / {self.condition}'
+        return f'{self.name} (¥{self.price}) {self.size} / {self.product_category} / {self.condition}'
 
 
