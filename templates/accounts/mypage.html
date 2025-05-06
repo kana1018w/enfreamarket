@@ -16,6 +16,9 @@
 <div class="mypage-container">
     {# --- 左側メニューエリア --- #}
     <div class="mypage-menu">
+        <a href="{% url 'products:favorite_list' %}" class="list-group-item list-group-item-action">
+            お気に入り >
+        </a>
         <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action">
             出品した商品 >
         </a>
