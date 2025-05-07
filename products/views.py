@@ -150,6 +150,46 @@ def edit(request, pk):
     }
     return render(request, 'products/edit.html', context)
 
+
+# 商品削除
+@login_required
+def delete(request, pk):
+    """商品削除 (確認画面表示 & 削除実行)"""
+    product = get_object_or_404(Product, pk=pk)
+    sub_images = product.images.filter(display_order__gt=0)
+
+    # 出品者でなければ削除できない
+    if product.user != request.user:
+        messages.error(request, "この商品を削除する権限がありません。ログインし直してください。")
+        return redirect('accounts:login')
+
+    if request.method == 'POST':
+        try:
+            # 既存のメイン画像を削除
+            if product.main_product_image:
+                product.main_product_image.image.delete(save=False) # ファイル削除
+                product.main_product_image.delete() # ProductImageレコード削除
+
+            # 既存のサブ画像を削除 とファイル)
+            for sub_image in sub_images:
+                sub_image.image.delete(save=False)
+                sub_image.delete()
+
+            product.delete() # 商品オブジェクト自体を削除
+            messages.success(request, f'商品「{product.name}」を削除しました。')
+            return redirect('accounts:my_listings')
+        except Exception as e:
+            messages.error(request, '商品の削除中にエラーが発生しました。')
+            # エラー時は商品詳細ページなどに戻すか、再度確認画面を表示
+            return redirect('products:edit', pk=product.pk)
+
+    # GETリクエストの場合 (最初に削除ボタンが押された時、または削除確認画面の再表示)
+    context = {
+        'product': product
+    }
+    return render(request, 'products/delete_confirm.html', context)
+
+
 # 気になるリスト
 def favorite_list(request): 
     return render(request, 'products/favorite_list.html')

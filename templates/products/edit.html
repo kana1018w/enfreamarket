@@ -146,9 +146,9 @@
                 </div>
 
                 {# --- 更新ボタンと削除ボタン --- #}
-                <div class="d-flex justify-content-center gap-3">
-                    <button type="submit" class="btn btn-primary-action">更新</button>
-                    <button type="submit" class="btn btn-danger-action">削除</button>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary-action mr-3">更新</button>
+                    <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-danger-action">削除</a>
                 </div>
             </form>
         </div>
