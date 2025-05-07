@@ -86,7 +86,7 @@ class ProductForm(forms.ModelForm):
     # --- メイン画像フィールド ---
     main_image = forms.ImageField(
         label='メイン画像',
-        required=True,
+        required=False, # 編集画面の実装の関係で一旦False, init method で商品登録時はTrue に変更
         error_messages={'required': 'メイン画像を登録してください。'},
         widget=forms.FileInput(attrs={'class': 'form-control main-image'}),
         help_text='メイン画像の登録は必須です。' # clean_sub_images で枚数制限 
@@ -118,6 +118,23 @@ class ProductForm(forms.ModelForm):
             'description',
             # main_image, sub_images はモデル外なので含めない
         ]
+
+    def __init__(self, *args, **kwargs):
+        """フォーム初期化時に編集かどうかを判定し、画像フィールドの必須属性等を調整"""
+        # 親クラスの __init__ を呼び出す前に instance があるか確認
+        is_edit = kwargs.get('instance') is not None
+        super().__init__(*args, **kwargs) # 親クラスの初期化
+
+        # is_edit フラグに基づいて main_image の設定を変更
+        # 一旦 編集では写真の編集機能を実装しないので、main_image を非必須にする
+        if is_edit:
+            self.fields['main_image'].required = False
+            self.fields['main_image'].help_text = '現在の画像を変更する場合のみ、新しい画像をアップロードしてください。'
+        else:
+            # 新規出品時
+            self.fields['main_image'].required = True
+            self.fields['main_image'].error_messages = {'required': 'メイン画像を登録してください。'}
+            self.fields['main_image'].help_text = 'メイン画像の登録は必須です。'
 
     # --- サブ画像の枚数チェック (前回と同様) ---
     def clean_sub_images(self):

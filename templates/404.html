@@ -1,0 +1,16 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block page_title %}
+404
+{% endblock %}
+
+{% block body_content %}
+<div class="text-center">
+    <p>お探しのページは見つかりませんでした</p>
+    <p>入力されたURLが間違っているか、ページが削除された可能性があります。</p>
+    <a href="{% url 'products:index' %}" class="link-subtle">
+        ホームに戻る
+    </a>
+</div>
+{% endblock %}

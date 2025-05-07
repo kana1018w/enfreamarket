@@ -51,7 +51,7 @@
                                 {# --- その他情報 --- #}
                                 <div class="col-md-5 col-12">
                                     <div class="d-flex justify-content-md-end align-items-center item-status-menu">
-                                        {% if product.status != product.Status.SOLD.value %}
+                                        {% if product.status == product.Status.FOR_SALE.value %}
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
                                             {# 編集ボタン#}

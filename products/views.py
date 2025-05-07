@@ -1,16 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db import transaction
 from .forms import ProductForm
 from .models import Product, ProductImage
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
 
 
 # Create your views here.
 def index(request):
     return render(request, 'products/index.html')
 
-# 出品
+# 商品出品
 @login_required # ログイン必須にするデコレータ
 def sell(request):
     """商品出品ビュー"""
@@ -97,8 +98,57 @@ def detail(request, pk):
     return render(request, 'products/detail.html')
 
 # 商品編集
+@login_required
 def edit(request, pk):
-    return render(request, 'products/edit.html')
+    """商品編集ビュー (一旦画像編集機能を除く)"""
+    product = get_object_or_404(Product, pk=pk)
+
+    if product.user != request.user:
+        messages.error(request, "この商品を編集する権限がありません。ログインし直してください。")
+        return redirect('accounts:login')
+
+    if request.method == 'POST':
+        # 編集データを取得
+        form = ProductForm(request.POST, instance=product)
+
+        if form.is_valid():
+            try:
+                # 複数のフィールド更新のため、トランザクションを開始
+                with transaction.atomic():
+                    form.save()
+
+                messages.success(request, '商品情報を更新しました。')
+                return redirect('accounts:my_listings')
+
+            except Exception as e:
+                print(f"Error during product update (text fields only): {e}")
+                messages.error(request, '商品情報の更新中にエラーが発生しました。')
+                # エラー発生時もフォームを再表示 (編集中のデータを保持)
+                context = {
+                    'form': form,
+                    'product': product # テンプレートで商品情報を参照する場合に備えて渡す
+                }
+                return render(request, 'products/edit.html', context)
+
+        else:
+            print(form.errors)
+            messages.error(request, '入力内容に誤りがあります。ご確認ください。')
+            # エラーメッセージ付きのフォームを再表示
+            context = {
+                'form': form,
+                'product': product
+            }
+            return render(request, 'products/edit.html', context)
+
+    else:
+        # GETリクエストの場合
+        form = ProductForm(instance=product)
+
+    context = {
+        'form': form,
+        'product': product
+    }
+    return render(request, 'products/edit.html', context)
 
 # 気になるリスト
 def favorite_list(request): 
