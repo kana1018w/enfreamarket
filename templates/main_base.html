@@ -38,17 +38,21 @@
         {% endfor %}
   {% endif %}
     <div class="card container">
-      <!-- ヘッダー（戻る + タイトル） -->
-        <div class="card-header d-flex align-items-center position-relative">
-          <a href="{% block back_href %}javascript:history.back(){% endblock %}" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a> <!-- 戻る or パンくず：子テンプレートで上書き -->
-            <h3 class="card-title mx-auto">{% block page_title %}{% endblock %}</h3> <!-- mx-auto 左右マージンが自動になり、タイトル中央寄せ -->
-        </div>
-    
-        <!-- コンテンツ -->
-        <div class="card-content">
-            {% block body_content %}
-            {% endblock %}
-        </div>
+      <!-- タイトル　-->
+      <div class="card-header text-center">
+        <h4>{% block page_title %}{% endblock %}</h4>
+      </div>
+
+      <!-- 戻る or パンくず：子テンプレートで上書き -->
+      <div class="position-relative">
+        <a href="{% block back_href %}javascript:history.back(){% endblock %}" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a>
+      </div>
+
+      <!-- コンテンツ -->
+      <div class="card-content">
+        {% block body_content %}
+        {% endblock %}
+      </div>
     </div>
 </div>
 {%endblock%}

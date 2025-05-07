@@ -12,23 +12,18 @@
     padding: 24px;
 }
 
-/* ヘッダー部分（戻る・タイトル） */
+/* ヘッダー部分（タイトル） */
 .card-header {
     background-color: #fff;
     position: relative;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
+    padding: 0;
     text-align: center;
-}
-
-/* タイトル中央寄せ */
-.card-title {
-    font-size: 1.5rem;
-    margin: 0;
 }
   
 /* 戻るリンク */
 .back-link {
-    position: absolute; left: 0; /* ← 絶対位置：左端に配置 */
+    position: static; left: 0; /* ← 絶対位置：左端に配置 */
     left: 0;
     color: #6c879e;
     text-decoration: none;
