@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block page_title %}
-商品情報
+商品編集
 {% endblock %}
 
 {% block back_or_breadcrumb %}
@@ -17,14 +17,16 @@
     <div class="row justify-content-center">
         <div class="card-body col-md-8">
             {% if form.non_field_errors %}
-                <ul class="errorlist nonfield">
+                <ul class="errorlist nonfield alert alert-danger">
                 {% for error in form.non_field_errors %}
                     <li>{{ error }}</li>
                 {% endfor %}
                 </ul>
             {% endif %}
-            <form method="post" enctype="multipart/form-data" novalidate>
+            {# ★ action 属性は現在のURLを指すようにする #}
+            <form method="post" action="{% url 'products:product_edit' product.pk %}" novalidate>
                 {% csrf_token %}
+
                 {# --- 商品名 --- #}
                 <div class="mb-3">
                     <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}{% if form.name.field.required %}<span class="text-danger">*</span>{% endif %}</label>
@@ -33,9 +35,9 @@
                         <small class="form-text text-muted">{{ form.name.help_text }}</small>
                     {% endif %}
                     {% if form.name.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.name.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -47,15 +49,15 @@
                 <div class="mb-3">
                     <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }}{% if form.price.field.required %}<span class="text-danger">*</span>{% endif %}</label>
                     <div class="input-group w-50">
-                        {{ form.price }} 円
+                        {{ form.price }} <span class="input-group-text">円</span>
                     </div>
                     {% if form.price.help_text %}
                         <small class="form-text text-muted">{{ form.price.help_text }}</small>
                     {% endif %}
                     {% if form.price.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.price.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -65,18 +67,18 @@
                 {# --- カテゴリ --- #}
                 <div class="mb-3">
                     <label class="form-label">{{ form.product_category.label }}{% if form.product_category.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                    <div class="d-flex flex-wrap"> {# ラジオボタンを横並びにする場合 #}
+                    <div class="d-flex flex-wrap">
                         {% for radio in form.product_category %}
-                        <div class="form-check form-check-inline me-3 mb-1 form-check-radio"> {# form-check-inlineで横並び #}
-                            {{ radio.tag }}
+                        <div class="form-check form-check-inline me-3 mb-1 form-check-radio">
+                            {{ radio.tag }} {# value がセットされ、選択状態が反映される #}
                             <label for="{{ radio.id_for_label }}" class="form-check-label">{{ radio.choice_label }}</label>
                         </div>
                         {% endfor %}
                     </div>
                     {% if form.product_category.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.product_category.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -95,9 +97,9 @@
                         {% endfor %}
                     </div>
                     {% if form.size.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.size.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -116,73 +118,37 @@
                         {% endfor %}
                     </div>
                     {% if form.condition.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.condition.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
                 </div>
                 <hr class="my-4">
 
-                {# --- 写真 (左:メイン, 右:サブ) --- #}
-                <div class="mb-3">
-                    <label class="form-label">写真{% if form.main_image.field.required or form.sub_images.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                    <div class="image-upload-container">
-                        {# --- メイン画像 --- #}
-                        <div class="mb-3">
-                            <label for="{{ form.main_image.id_for_label }}" style="font-size: 14px">{{ form.main_image.label }}{% if form.main_image.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            <input type="file" name="{{ form.main_image.name }}" id="{{ form.main_image.id_for_label }}" class="form-control form-img-input ">
-                            {% if form.main_image.help_text %}
-                                <small class="form-text text-muted">{{ form.main_image.help_text }}</small>
-                            {% endif %}
-                            {% if form.main_image.errors %}
-                                <ul class="errorlist">
-                                    {% for error in form.main_image.errors %}
-                                    <li class="form-error">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
-
-                        {# --- サブ画像 --- #}
-                        <div class="mb-3">
-                            <label for="{{ form.sub_images.id_for_label }}" style="font-size: 14px">{{ form.sub_images.label }}</label>
-                            <input type="file" name="{{ form.sub_images.name }}" id="{{ form.sub_images.id_for_label }}" class="form-control form-img-input " multiple> {# 複数ファイル選択可能 #}
-                            {% if form.sub_images.help_text %}
-                                <small class="form-text text-muted">{{ form.sub_images.help_text }}</small>
-                            {% endif %}
-                            {% if form.sub_images.errors %}
-                                <ul class="errorlist">
-                                    {% for error in form.sub_images.errors %}
-                                    <li class="form-error">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <hr class="my-4">
+                <!-- 写真の編集は一旦省略 -->
 
                 {# --- 商品説明 --- #}
                 <div class="mb-3">
-                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label> {# 任意なので * なし #}
-                    {{ form.description }} {# ウィジェットのattrsでclass="form-control"設定済み #}
+                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                    {{ form.description }}
                     {% if form.description.help_text %}
                         <small class="form-text text-muted">{{ form.description.help_text }}</small>
                     {% endif %}
                     {% if form.description.errors %}
-                        <ul class="errorlist">
+                        <ul class="errorlist text-danger">
                             {% for error in form.description.errors %}
-                            <li class="form-error">{{ error }}</li>
+                            <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
                 </div>
 
-                {# --- 出品ボタン --- #}
-                <div class="d-grid gap-2 col-4 mx-auto mt-5"> {# 中央寄せ・幅調整 #}
-                    <button type="submit" class="btn btn-primary-action btn-block">出品</button>
+                {# --- 更新ボタンと削除ボタン --- #}
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary-action mr-3">更新</button>
+                    <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-danger-action">削除</a>
                 </div>
             </form>
         </div>

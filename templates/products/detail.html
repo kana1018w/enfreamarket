@@ -1,0 +1,138 @@
+{% extends 'main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+{% endblock %}
+
+{% block page_title %}
+商品詳細
+{% endblock %}
+
+{% block back_or_breadcrumb %}
+<div >
+    <nav aria-label="breadcrumb"">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:top' %}" class="link-subtle">商品一覧</a></li>
+            <li class="breadcrumb-item"><a href="#" class="link-subtle">{{ product.product_category.name }}</a></li> {# TODO #}
+        </ol>
+    </nav>
+</div>
+{% endblock %}
+
+{% block body_content %}
+<div class="container mt-3">
+    <div class="product-detail-grid">
+        {# --- 左カラム: 画像 --- #}
+        <section class="product-images-section">
+            <div class="main-image-wrapper">
+                {% if product.main_product_image %}
+                    <img src="{{ product.main_product_image.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <!-- メイン画像は必須だが念の為 -->                  
+                    <div class="w300 h-300 bg-light d-flex align-items-center justify-content-center text-muted small">画像がありません</div>
+                {% endif %}
+            </div>
+            <div class="sub-images-wrapper">
+                {% if sub_images %}
+                    {% for sub_img in sub_images %}
+                        <div class="sub-image-box">
+                            <img src="{{ sub_img.image.url }}" alt="サブ画像 {{ forloop.counter }}">
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
+
+        {# --- 右カラム: 商品情報 --- #}
+        <section class="product-info-section">
+            <div class="product-header">
+                <h1 class="product-name">{{ product.name }}</h1>
+                <div class="product-price-fav">
+                    <span class="product-price">¥{{ product.price|intcomma }}</span>
+                    <span class="fav-icon-placeholder" title="お気に入りに追加"></span> {# TODO お気に入りに追加 #}
+                    
+                    {# --- ステータス (取引中/売却済のみ表示) --- #}
+                    {% if product.status == product.Status.FOR_SALE %}
+                        <span class="status-badge status-for-sale">販売中</span>
+                    {% elif product.status == product.Status.IN_TRANSACTION %}
+                        <span class="status-badge status-in-transaction">取引中</span>
+                    {% elif product.status == product.Status.SOLD %}
+                        <span class="status-badge status-sold">売却済</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <p class="seller-name">出品者: {{ product.user.display_name|default:product.user.name }}</p>
+            <div class="product-details-title flex-column gap-2 ">
+                <span>カテゴリ: {{ product.product_category.name }}</span>
+                <span>サイズ: {{ product.get_size_display }}</span>
+                <span>状態: {{ product.get_condition_display }}</span>
+            </div>
+
+            <div class="action-button-wrapper">
+            {% if is_owner %}
+                <div class="owner-actions">
+                    {% if product.status != product.Status.SOLD_OUT %}
+                        <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action">編集</a>
+                        <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger-action">削除</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% if product.status == product.Status.FOR_SALE %}
+                    <button type="button" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
+                    {# 「購入意思表示済」の表示 TODO #}
+                    <button type="button" class="btn btn-sm btn-primary-action" disabled>購入意思表示済</button>
+                {% endif %}
+            {% endif %}
+            </div>
+
+            <h2 class="description-title">商品説明</h2>
+            <div class="description-content">
+                <p style="white-space: pre-wrap">{{ product.description|default:"商品説明はありません。"|linebreaksbr }}</p>
+            </div>
+
+            <h2 class="comments-title">コメント <span class="comments-count small">(2)</span></h2>
+
+            <div class="comment-form-wrapper">
+            {% if request.user.is_authenticated %}
+                <form method="POST" action="#"> {# actionはコメント投稿ビューのURLに #}
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <textarea name="comment_text" class="form-control" rows="3" placeholder="商品へのコメント"></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-secondary-action btn-sm">コメント送信</button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-muted small">コメントするには<a href="{% url 'accounts:login' %}?next={{ request.path }}">ログイン</a>してください。</p>
+            {% endif %}
+            </div>
+    
+            <div class="comments-list">
+                {# ダミーコメント1 #}
+                <div class="comment-item">
+                    <div>
+                        <span class="font-weight-bold">太郎ママ</span>
+                        <span class="comment-date">3日前</span>
+                    </div>
+                    <p class="comment-text">説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明</p>
+                </div>
+                {# ダミーコメント2 #}
+                <div class="comment-item">
+                    <div>
+                        <span class="font-weight-bold">花子さん</span>
+                        <span class="comment-date">1日前</span>
+                    </div>
+                    <p class="comment-text">説明文が入ります。</p>
+                </div>
+                {# ... コメントをループ表示 ... #}
+            </div>
+
+        </section>
+    </div>
+</div>
+{% endblock %}

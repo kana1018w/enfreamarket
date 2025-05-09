@@ -7,6 +7,7 @@ from django.contrib import messages # メッセージを表示する場合に使
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from products.models import Product, ProductImage
 
 
 
@@ -86,9 +87,8 @@ def signup(request):
                 # 登録成功後の処理 
                 auth_login(request, user)
 
-                # このメッセージは、リダイレクト先のテンプレートで表示できます。
                 messages.success(request, 'アカウント登録が完了しました。ご利用のルールをご確認の上、サービスをご利用ください。')
-                return redirect('freamarket:index')
+                return redirect('products:top')
 
             except ValueError as e:
                 # models.py の create_user 内で発生した ValueError をキャッチした場合
@@ -96,9 +96,12 @@ def signup(request):
                 form.add_error(None, f"登録エラーが発生しました: {e}") # フォーム全体のエラーとして表示
             except Exception as e:
                 # その他の予期せぬエラーが発生した場合
-                # (実際には、エラー内容をログに記録するなどの処理が推奨されます)
                 print(f"予期せぬエラー: {e}") # 開発中はコンソールに出力
                 form.add_error(None, '登録中に予期せぬエラーが発生しました。しばらくしてから再度お試しください。')
+
+        else:
+            # フォームが無効な場合 (バリデーションNG)
+            messages.error(request, '入力内容に誤りがあります。内容を確認してください。')
 
     # GETリクエストの場合 (最初にページを開いた場合)
     else:
@@ -129,7 +132,29 @@ def mypage(request):
 
 @login_required
 def my_listings(request):
-    return render(request, 'accounts/my_listings.html')
+    """出品した商品一覧ビュー"""
+    # ログイン中のユーザーが出品した商品を取得
+    # Productモデルの user フィールドでフィルター
+    # main_product_image を参照するので select_related でJoinした結果を取得しておく (N+1対策)
+    user_products = Product.objects.filter(user=request.user).select_related(
+        'main_product_image' # メイン画像の情報を一緒に取得
+    ).order_by('-created_at')
+
+    # 商品のステータスに応じてステータスクラスを追加し、テンプレートに渡す
+    for product in user_products:
+        if product.status == Product.Status.FOR_SALE:
+            product.status_class = "status-for-sale"
+        elif product.status == Product.Status.IN_TRANSACTION:
+            product.status_class = "status-in-transaction"
+        elif product.status == Product.Status.SOLD:
+            product.status_class = "status-sold"
+        else:
+            product.status_class = ""
+
+    context = {
+        'products': user_products,
+    }
+    return render(request, 'accounts/my_listings.html', context)
 
 @login_required
 def my_intents_given(request):

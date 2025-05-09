@@ -3,7 +3,7 @@
 {%block header%}
 <div class="container d-flex justify-content-between align-items-center py-2">
     <div class="logo-area">
-      <a href="{% url 'products:index' %}">
+      <a href="{% url 'products:top' %}">
         <img src="{% static 'img/header_logo.png' %}" alt="園フリマロゴ" class="header-logo">
       </a>
     </div>
@@ -12,7 +12,7 @@
         {% if user.is_authenticated %}
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:mypage' %}">マイページ</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'products:sell' %}">出品</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'products:favorite_list' %}">気になるリスト</a></li>
+          <li class="nav-item"><a class="nav-link fav-icon-placeholder" href="{% url 'products:favorite_list' %} title="お気に入り"></a></li>
           <li class="nav-item">
             <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
                 {% csrf_token %}
@@ -38,17 +38,21 @@
         {% endfor %}
   {% endif %}
     <div class="card container">
-      <!-- ヘッダー（戻る + タイトル） -->
-        <div class="card-header d-flex align-items-center position-relative">
-            <a href="javascript:history.back()" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a> <!-- 戻る or パンくず：子テンプレートで上書き -->
-            <h3 class="card-title mx-auto">{% block page_title %}{% endblock %}</h3> <!-- mx-auto 左右マージンが自動になり、タイトル中央寄せ -->
-        </div>
-    
-        <!-- コンテンツ -->
-        <div class="card-content">
-            {% block body_content %}
-            {% endblock %}
-        </div>
+      <!-- タイトル　-->
+      <div class="card-header text-center">
+        <h4>{% block page_title %}{% endblock %}</h4>
+      </div>
+
+      <!-- 戻る or パンくず：子テンプレートで上書き -->
+      <div class="position-relative">
+        <a href="{% block back_href %}javascript:history.back(){% endblock %}" class="back-link">{% block back_or_breadcrumb %}{% endblock %}</a>
+      </div>
+
+      <!-- コンテンツ -->
+      <div class="card-content">
+        {% block body_content %}
+        {% endblock %}
+      </div>
     </div>
 </div>
 {%endblock%}
