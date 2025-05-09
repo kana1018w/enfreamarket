@@ -88,7 +88,7 @@ def signup(request):
                 auth_login(request, user)
 
                 messages.success(request, 'アカウント登録が完了しました。ご利用のルールをご確認の上、サービスをご利用ください。')
-                return redirect('products:index')
+                return redirect('products:top')
 
             except ValueError as e:
                 # models.py の create_user 内で発生した ValueError をキャッチした場合
