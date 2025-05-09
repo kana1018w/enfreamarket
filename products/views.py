@@ -1,15 +1,102 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
-from .forms import ProductForm
+from django.db.models import Q
+from .forms import ProductForm, ProductSearchForm
 from .models import Product, ProductImage
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
+    """トップページ (商品一覧) ビュー"""
 
-# Create your views here.
-def index(request):
-    return render(request, 'products/index.html')
+    # 1. 商品データの取得とフィルタリング
+    # Product.Status.ON_SALE の値はモデル定義に合わせてください。
+    queryset = Product.objects.filter(status=Product.Status.FOR_SALE).select_related(
+        'main_product_image',
+        'product_category'
+    ).order_by('-created_at')
+
+    # 検索結果を表示しない時用に変数の初期化
+    selected_category_for_breadcrumb = None
+
+    # 2. 検索フォームの処理
+    search_form = ProductSearchForm(request.GET or None)
+
+    if search_form.is_valid():
+        # 検索ルール
+        # キーワード、カテゴリ、価格、の絞り込みは AND 検索で行う
+        # サイズ、状態の絞り込みは OR 検索で行う　（チェックされたサイズ（状態）のいずれかに合致する）
+        
+        # --- キーワード検索 ---
+        keyword = search_form.cleaned_data.get('keyword')
+        if keyword:
+            # 商品名 (name) または 商品説明 (description) にキーワードが含まれるものをOR検索
+            # 大文字・小文字を区別しない部分一致 (icontains)
+            queryset = queryset.filter(
+                Q(name__icontains=keyword) | Q(description__icontains=keyword)
+            )
+
+        # --- カテゴリ絞り込み ---
+        categories = search_form.cleaned_data.get('category') # ModelMultipleChoiceFieldはクエリセットを返す
+        if categories: # 何かカテゴリが選択されていれば
+            queryset = queryset.filter(product_category__in=categories)
+            if categories.exists(): # 選択されたカテゴリが1つ以上あれば
+                selected_category_for_breadcrumb = categories.first().name # 最初のカテゴリ名
+
+        # --- 価格帯絞り込み ---
+        price_min = search_form.cleaned_data.get('price_min')
+        if price_min is not None: # 0も有効な値なので is not None でチェック
+            queryset = queryset.filter(price__gte=price_min)
+
+        price_max = search_form.cleaned_data.get('price_max')
+        if price_max is not None:
+            queryset = queryset.filter(price__lte=price_max)
+
+        # --- サイズ絞り込み ---
+        sizes = search_form.cleaned_data.get('size')
+        if sizes:
+            query_size = Q()
+            for s in sizes:
+                query_size |= Q(size=s) # 各サイズに対してOR条件でつなぐ
+            if query_size: # 何かサイズが選択されていれば
+                 queryset = queryset.filter(query_size)
+
+        # --- 状態絞り込み ---
+        conditions = search_form.cleaned_data.get('condition')
+        if conditions:
+            query_condition = Q()
+            for c in conditions:
+                query_condition |= Q(condition=c)
+            if query_condition:
+                 queryset = queryset.filter(query_condition)
+
+    # else:
+        # フォームが無効な場合 (例: price_min > price_max)、エラーはフォームオブジェクトに
+        # 格納されているので、テンプレート側で表示できる。
+        # クエリセットは初期状態のまま (フィルタリングしない)。
+        # print(search_form.errors) # デバッグ用にエラー表示
+
+    # 3. ページネーション処理
+    paginator = Paginator(queryset, 10) # 1ページあたり10件表示
+    page_number = request.GET.get('page')
+
+    try:
+        products_on_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        # 'page' パラメータが整数でない場合、最初のページを表示
+        products_on_page = paginator.page(1)
+    except EmptyPage:
+        # 'page' パラメータが範囲外の場合 (例: 9999ページ目)、最後のページを表示
+        products_on_page = paginator.page(paginator.num_pages)
+
+    context = {
+        'products': products_on_page, # 現在のページの商品リスト
+        'search_form': search_form,   # 絞り込み検索フォーム (後で追加)
+        'selected_category_for_breadcrumb': selected_category_for_breadcrumb, # パンクズリストのカテゴリ表示で使用
+    }
+    return render(request, 'products/product_list.html', context)
 
 # 商品出品
 @login_required # ログイン必須にするデコレータ

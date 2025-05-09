@@ -146,3 +146,68 @@ class ProductForm(forms.ModelForm):
         return sub_images
 
     # --- 全体に関わるバリデーション は特にないのでcleanメソッドは定義しない ---
+
+
+class ProductSearchForm(forms.Form):
+    """商品絞り込み検索フォーム"""
+    # --- (オプション) キーワード検索フィールド ---
+    keyword = forms.CharField(
+        label='キーワード',
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': '商品名、説明文、キーワードを入力', 'class': 'form-control'}),
+    )
+
+    # --- カテゴリ選択フィールド ---
+    # 複数選択可能なチェックボックスとして表示
+    category = forms.ModelMultipleChoiceField(
+        label='カテゴリ',
+        queryset=ProductCategory.objects.all().order_by('name'),
+        widget=forms.CheckboxSelectMultiple,
+        required=False, # 絞り込みなので必須ではない
+    )
+
+    # --- 価格帯指定フィールド ---
+    price_min = forms.IntegerField(
+        label='価格（下限）',
+        required=False,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'placeholder': '例: 1000', 'class': 'form-control'}),
+    )
+    price_max = forms.IntegerField(
+        label='価格（上限）',
+        required=False,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'placeholder': '例: 5000', 'class': 'form-control'}),
+    )
+
+    # --- サイズ選択フィールド ---
+    # ProductモデルのSize Choicesを利用
+    size = forms.TypedMultipleChoiceField(
+        label='サイズ',
+        choices=Product.Size.choices,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        coerce=int, # 選択された値を整数に変換 (モデルの保存値が整数なので)
+    )
+
+    # --- 状態選択フィールド ---
+    # ProductモデルのCondition Choicesを利用
+    condition = forms.TypedMultipleChoiceField(
+        label='商品の状態',
+        choices=Product.Condition.choices, # Product.Condition の choices を利用
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        coerce=int, # 選択された値を整数に変換
+    )
+
+    def clean(self):
+        """価格帯のバリデーション"""
+        cleaned_data = super().clean()
+        price_min = cleaned_data.get('price_min')
+        price_max = cleaned_data.get('price_max')
+
+        # 最小価格が最大価格を超えている場合
+        if price_min is not None and price_max is not None and price_min > price_max:
+            # 両方はくどいので片方にエラーメッセージを追加する
+            self.add_error('price_min', '価格帯の指定が正しくありません。下限価格は上限価格以下にしてください。')
+        return cleaned_data

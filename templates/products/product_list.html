@@ -1,0 +1,236 @@
+{% extends 'main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_list.css' %}">
+{% endblock %}
+
+{% block page_title %}
+商品一覧
+{% endblock %}
+
+{% block back_or_breadcrumb %}
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:top' %}" class="link-subtle">商品一覧</a></li>
+            {% if selected_category_for_breadcrumb %}
+                <li class="breadcrumb-item">{{ selected_category_for_breadcrumb }}</li>
+                <li class="breadcrumb-item"><a href="#" class="link-subtle">{{ selected_category_for_breadcrumb }}</a></li>
+            {% endif %}
+        </ol>
+    </nav>
+</div>
+{% endblock %}
+
+
+{% block body_content %}
+<div class="container my-4">
+    <div class="product-list-container">
+        {# --- 左サイドバー: 絞り込み検索 --- #}
+        <aside class="search-sidebar">
+            <h5 class="mb-3 text-muted">商品を絞り込む</h5>
+            <form method="get" action="{% url 'products:top' %}">
+                {# CSRFトークンはGETフォームなので不要 #}
+
+                {# キーワード検索 #}
+                <div class="form-group">
+                    <label for="{{ search_form.keyword.id_for_label }}">{{ search_form.keyword.label }}</label>
+                    {{ search_form.keyword }}
+                    {% if search_form.keyword.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in search_form.keyword.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# カテゴリ #}
+                <div class="form-group">
+                    <label>{{ search_form.category.label }}</label>
+                    <div class="checkbox-list d-flex flex-wrap" style="max-height: 150px; overflow-y: auto;">
+                        {% for checkbox in search_form.category %}
+                        <div class="form-check d-flex align-items-center me-3">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if search_form.category.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in search_form.category.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# 価格帯 #}
+                <div class="form-group">
+                    <label>価格帯</label>
+                    <div class="price-range-inputs">
+                        {{ search_form.price_min }}
+                        <span>～</span>
+                        {{ search_form.price_max }}
+                    </div>
+                    {# フォーム全体のバリデーションエラー #}
+                    {% if search_form.non_field_errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in search_form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# サイズ #}
+                <div class="form-group">
+                    <label>{{ search_form.size.label }}</label>
+                    <div class="checkbox-list d-flex flex-wrap" style="max-height: 150px; overflow-y: auto;">
+                        {% for checkbox in search_form.size %}
+                        <div class="form-check d-flex align-items-center me-3">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                     {% if search_form.size.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in search_form.size.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# 状態 #}
+                <div class="form-group">
+                    <label>{{ search_form.condition.label }}</label>
+                    <div class="checkbox-list d-flex flex-wrap" style="max-height: 150px; overflow-y: auto;">
+                        {% for checkbox in search_form.condition %}
+                        <div class="form-check d-flex align-items-center me-3">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                     {% if search_form.condition.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in search_form.condition.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-secondary-action">検索</button>
+                </div>
+            </form>
+        </aside>
+
+        {# --- 右コンテンツエリア: 商品一覧 --- #}
+        <main class="product-list-items">
+            {% if products %}
+            <div class="list-group mx-auto">
+                {% for product in products %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            {# --- 商品画像 --- #}
+                            <div class="col-md-2 col-3">
+                                <a href="{% url 'products:product_detail' pk=product.pk %}">
+                                    {% if product.main_product_image %}
+                                        <img src="{{ product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
+                                    {% else %} {# メイン画像は必須だが念の為 #}
+                                        {# 代替画像 #}
+                                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 100px;">
+                                            <small>画像なし</small>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                            <div class="col-md-10 col-9" >
+                                <div class="row align-items-center">
+                                    <div class="col-md-7 col-12">
+                                        <div class="product-title">
+                                            {# 商品名 #}
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'products:product_detail' pk=product.pk %}" class="text-decoration-none text-dark">
+                                                    {{ product.name }}
+                                                </a>
+                                            </h6>
+                                        </div>
+                                        <div class="product-description small mt-2 "> {{ product.description }} </div>
+                                    </div>
+                                    <div class="col-md-5 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                            {# 価格 #}
+                                            <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
+                                            <span class="fav-icon-placeholder" title="お気に入りに追加"></span> {# TODO お気に入りに追加 #}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# --- ページネーション --- #}
+            {% if products.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}&{{ key }}={{ value }}{% endfor %}{% endif %}{% endfor %}" aria-label="First">
+                                <span aria-hidden="true">««</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.previous_page_number }}{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}&{{ key }}={{ value }}{% endfor %}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">«</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">««</span></li>
+                        <li class="page-item disabled"><span class="page-link">«</span></li>
+                    {% endif %}
+
+                    {% for i in products.paginator.page_range %}
+                        {% if products.number == i %}
+                            <li class="page-item" aria-current="page"><span class="page-link page-active">{{ i }}</span></li>
+                            
+                        {# 現在のページの前後の数ページのみ表示 (±4ページ) #}
+                        {% elif i > products.number|add:'-5' and i < products.number|add:'5' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}&{{ key }}={{ value }}{% endfor %}{% endif %}{% endfor %}">{{ i }}</a></li>
+                        {% elif i == products.number|add:'-5' or i == products.number|add:'5' %}
+                             <li class="page-item disabled"><span class="page-link">...</span></li> {# 省略記号 #}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}&{{ key }}={{ value }}{% endfor %}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">»</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.paginator.num_pages }}{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}&{{ key }}={{ value }}{% endfor %}{% endif %}{% endfor %}" aria-label="Last">
+                                <span aria-hidden="true">»»</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">»</span></li>
+                        <li class="page-item disabled"><span class="page-link">»»</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+                <p class="text-center text-muted mt-5">該当する商品が見つかりませんでした。</p>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

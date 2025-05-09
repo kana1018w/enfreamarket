@@ -1,0 +1,69 @@
+.product-list-container {
+    display: flex;
+    gap: 2rem; /* サイドバーとコンテンツエリアの間隔 */
+}
+.search-sidebar {
+    min-width: 320px;
+    flex: 0 1 320px; /* サイドバーの幅を固定 (調整可能) */
+    padding-right: 2rem;
+    border-right: 1px solid #dee2e6;
+}
+
+.product-list-items {
+    flex-grow: 1; /* 残りの幅をコンテンツエリアが取る */
+}
+.product-card {
+    border: 1px solid #eee;
+    transition: box-shadow .3s;
+}
+.product-card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+.product-card-img-top {
+    width: 100%;
+    height: 200px; /* カード画像の高さを統一 (調整可能) */
+    object-fit: cover; /* アスペクト比を保ちつつコンテナを埋める */
+}
+
+/* 検索サイドバー */
+.search-sidebar .form-group { /* フォームの各グループ */
+    margin-bottom: 1.5rem;
+}
+.search-sidebar label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+/* チェックボックスの調整 */
+.search-sidebar .form-check { 
+    margin-bottom: 0.3rem;
+}
+.search-sidebar .form-check-label {
+    margin-bottom: 0px;
+    margin-left: 4px; /* チェックボックスとラベルの間隔 */
+    font-weight: normal;
+}
+
+/* 価格範囲入力 */
+.price-range-inputs {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.price-range-inputs input {
+    flex: 1; /* 幅を自動調整 */
+    min-width: 0; /* flex 子要素が縮むことを許可する*/
+}
+
+/* ページネーション */
+.page-link {
+    cursor: pointer;
+    border: none;
+    color: #6c879e;
+    text-decoration: none;
+}
+.page-active {
+    background-color: #6c879e;
+    color: #fff;
+}
