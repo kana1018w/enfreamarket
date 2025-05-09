@@ -94,8 +94,36 @@ def sell(request):
     return render(request, 'products/sell.html', context)
 
 # 商品詳細
+@login_required
 def detail(request, pk):
-    return render(request, 'products/detail.html')
+    """商品詳細ページビュー"""
+    # Product オブジェクトを取得。関連オブジェクトも効率的に取得
+    # select_related: ForeignKey または OneToOneField (単一オブジェクト)
+    # prefetch_related: ManyToManyField または Reverse ForeignKey (複数オブジェクト)
+    product = get_object_or_404(
+        Product.objects.select_related(
+            'user__kindergarten',
+            'product_category',
+            'main_product_image'
+        ).prefetch_related(
+            'images' # ProductImage を逆参照 (related_name='images')
+        ),
+        pk=pk
+    )
+    sub_images = product.images.filter(display_order__gt=0).order_by('display_order')
+
+    # ログインユーザーが出品者かどうかを判定するフラグ
+    is_owner = False
+    if request.user.is_authenticated and product.user == request.user:
+        is_owner = True
+
+    context = {
+        'product': product,
+        'is_owner': is_owner,
+        'sub_images': sub_images,
+    }
+
+    return render(request, 'products/detail.html', context)
 
 # 商品編集
 @login_required
