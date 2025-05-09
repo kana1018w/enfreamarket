@@ -57,6 +57,24 @@ body.site-body {
     cursor: pointer;                /* ホバーしたときに手のカーソルに */
 }
 
+/* パンクズリスト */
+.breadcrumb{
+    font-size: 0.9rem;
+    background-color: transparent;
+    width: auto;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+.breadcrumb-item{
+    color: #6c879e;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.breadcrumb-item:hover{
+    color: #4a635d;
+}
+
 /* メイン */
 .site-main{
     margin-bottom: 50px;

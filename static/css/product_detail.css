@@ -1,20 +1,3 @@
-.breadcrumb{
-    font-size: 0.9rem;
-    background-color: transparent;
-    width: auto;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-}
-.breadcrumb-item{
-    color: #6c879e;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-.breadcrumb-item:hover{
-    color: #4a635d;
-}
-
 .product-detail-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr); /* 12カラムグリッド */
