@@ -45,6 +45,18 @@ body.site-body {
     color: #4A8A85;             /* 文字色はそのままキープ */
 }
 
+/* お気に入り */
+.fav-icon-placeholder {
+    width:  40px;
+    height: 40px;
+    background-image: url('/static/img/favorite.png');
+    background-size: cover;         /* アイコンサイズにフィット */
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    cursor: pointer;                /* ホバーしたときに手のカーソルに */
+}
+
 /* メイン */
 .site-main{
     margin-bottom: 50px;

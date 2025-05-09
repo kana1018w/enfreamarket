@@ -3,6 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
 {% endblock %}
 
 {% block page_title %}
@@ -46,6 +47,7 @@
                                             </a>
                                         </h6>
                                     </div>
+                                    <div class="product-description small mt-2 "> {{ product.description }} </div>
                                 </div>
 
                                 {# --- その他情報 --- #}
@@ -60,7 +62,7 @@
                                             </a>
                                         {% endif %}
                                         {# ステータス #}
-                                        <span class="status-label {{ product.status_class }}">
+                                        <span class="status-badge {{ product.status_class }}">
                                             {{ product.get_status_display }}
                                         </span>
                                     </div>
