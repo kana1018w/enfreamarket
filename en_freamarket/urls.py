@@ -24,7 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('core/', include('core.urls')),
     path('accounts/', include('accounts.urls')),
-    path('freamarket/', include('freamarket.urls')), #後で削除
     path('products/', include('products.urls')),
 ]
 

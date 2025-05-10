@@ -22,7 +22,7 @@ def login(request):
     """
     # ログイン済みユーザーがアクセスしたらトップページへリダイレクト (任意)
     if request.user.is_authenticated:
-        return redirect('freamarket:index') # トップページのURL名
+        return redirect('products:top') # トップページのURL名
 
     if request.method == 'POST':
         # カスタマイズした EmailAuthenticationForm を使用
@@ -34,7 +34,7 @@ def login(request):
             # ログイン状態にする
             auth_login(request, user)
             messages.success(request, f'ようこそ{user.display_name or user.name}さん、ログインしました。')
-            return redirect('freamarket:index') # トップページのURL名
+            return redirect('products:top')
         # else: バリデーション失敗 -> エラー付きフォームが render される
     else:
         # GETリクエスト -> 空のフォームを表示
@@ -54,7 +54,7 @@ def logout(request):
         messages.info(request, 'ログアウトしました。')
         return redirect('accounts:login')
     else:
-        return redirect('freamarket:index')
+        return redirect('products:top')
 
 def signup(request):
     """
