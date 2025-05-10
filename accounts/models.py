@@ -112,7 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField('アクティブ', default=True)
 
     # --- タイムスタンプ ---
-    created_at = models.DateTimeField('登録日時', auto_now_add=True) # auto_now_add=True に変更推奨
+    created_at = models.DateTimeField('登録日時', auto_now_add=True)
     updated_at = models.DateTimeField('更新日時', auto_now=True)
 
     # --- 権限関連 (related_name を指定) ---

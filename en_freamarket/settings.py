@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts',
     'kindergartens',
     'products',
+    'interactions',
 ]
 
 MIDDLEWARE = [

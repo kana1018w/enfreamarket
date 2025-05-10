@@ -17,6 +17,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'products:top' %}" class="link-subtle">商品一覧</a></li>
             <li class="breadcrumb-item"><a href="#" class="link-subtle">{{ product.product_category.name }}</a></li> {# TODO #}
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:10 }}</li> {# 商品名を短縮表示 #}
         </ol>
     </nav>
 </div>
@@ -75,7 +76,7 @@
             <div class="action-button-wrapper">
             {% if is_owner %}
                 <div class="owner-actions">
-                    {% if product.status != product.Status.SOLD_OUT %}
+                    {% if product.status != product.Status.SOLD %}
                         <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action">編集</a>
                         <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger-action">削除</a>
                     {% endif %}
@@ -94,44 +95,44 @@
                 <p style="white-space: pre-wrap">{{ product.description|default:"商品説明はありません。"|linebreaksbr }}</p>
             </div>
 
-            <h2 class="comments-title">コメント <span class="comments-count small">(2)</span></h2>
+            <h2 class="comments-title">コメント <span class="comments-count small">({{ comments.count }})</span></h2>
+    
+            <div class="comments-list">                
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="comment-item">
+                            <div class="comment-item-header d-flex justify-content-between align-items-center">
+                                <span class="font-weight-bold text-muted">{{ comment.user.display_name|default:comment.user.name }}</span>
+                                <span class="comment-date text-muted">{{ comment.created_at|timesince }}前</span>
+                            </div>
+                            <p class="comment-text ml-4 mt-1 mb-0">{{ comment.content|linebreaksbr }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
 
             <div class="comment-form-wrapper">
-            {% if request.user.is_authenticated %}
-                <form method="POST" action="#"> {# actionはコメント投稿ビューのURLに #}
-                    {% csrf_token %}
-                    <div class="mb-2">
-                        <textarea name="comment_text" class="form-control" rows="3" placeholder="商品へのコメント"></textarea>
-                    </div>
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-secondary-action btn-sm">コメント送信</button>
-                    </div>
-                </form>
-            {% else %}
-                <p class="text-muted small">コメントするには<a href="{% url 'accounts:login' %}?next={{ request.path }}">ログイン</a>してください。</p>
-            {% endif %}
-            </div>
-    
-            <div class="comments-list">
-                {# ダミーコメント1 #}
-                <div class="comment-item">
-                    <div>
-                        <span class="font-weight-bold">太郎ママ</span>
-                        <span class="comment-date">3日前</span>
-                    </div>
-                    <p class="comment-text">説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明説明</p>
+                {% if request.user.is_authenticated %}
+                    <form method="POST" action="{% url 'interactions:add_comment' product_pk=product.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <p class="font-weight-bold mb-1">商品へのコメント</p>
+                            {{ comment_form.content }}
+                            {% if comment_form.content.help_text %}
+                                <small class="form-text text-muted">{{ comment_form.content.help_text }}</small>
+                            {% endif %}
+                            {% for error in comment_form.content.errors %}
+                                <li class="form-error">{{ error }}</li>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-secondary-action btn-sm mt-2">コメント送信</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="text-muted small">コメントするには<a href="{% url 'accounts:login' %}?next={{ request.path }}">ログイン</a>してください。</p>
+                {% endif %}
                 </div>
-                {# ダミーコメント2 #}
-                <div class="comment-item">
-                    <div>
-                        <span class="font-weight-bold">花子さん</span>
-                        <span class="comment-date">1日前</span>
-                    </div>
-                    <p class="comment-text">説明文が入ります。</p>
-                </div>
-                {# ... コメントをループ表示 ... #}
-            </div>
-
         </section>
     </div>
 </div>

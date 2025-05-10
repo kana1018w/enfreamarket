@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from interactions.models import Comment
+from interactions.forms import CommentForm
 
 def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
     """トップページ (商品一覧) ビュー"""
@@ -193,11 +195,17 @@ def detail(request, pk):
             'product_category',
             'main_product_image'
         ).prefetch_related(
-            'images' # ProductImage を逆参照 (related_name='images')
+            'images', # ProductImage を逆参照 (related_name='images')
+            'comments__user' # Comment を逆参照 (related_name='comments') 
         ),
         pk=pk
     )
     sub_images = product.images.filter(display_order__gt=0).order_by('display_order')
+
+    
+    # 関連するコメントを取得
+    comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
+    comment_form = CommentForm()
 
     # ログインユーザーが出品者かどうかを判定するフラグ
     is_owner = False
@@ -208,6 +216,8 @@ def detail(request, pk):
         'product': product,
         'is_owner': is_owner,
         'sub_images': sub_images,
+        'comments': comments,
+        'comment_form': comment_form,
     }
 
     return render(request, 'products/detail.html', context)

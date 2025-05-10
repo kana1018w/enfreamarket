@@ -126,7 +126,7 @@
 }
 
 .comment-form-wrapper {
-    margin-bottom: 12px;
+    margin-top: 12px;
 }
 .comment-form-wrapper textarea {
     min-height: 70px;
@@ -135,8 +135,12 @@
 .comment-form-wrapper .btn {
     font-size: 0.9rem;
 }
+
+.comment-item-header {
+    margin-bottom: 2px;
+    font-size: 0.85rem;
+}
 .comment-item {
-    border-bottom: 1px solid #eee;
     padding: 10px 0;
     font-size: 0.9rem;
 }
@@ -144,10 +148,17 @@
     border-bottom: none;
 }
 
+.comment-text {
+    border: 1px solid #e0e0e0;
+    padding: 12px;
+    font-size: 0.9rem;
+    background-color: #fdfdfc;
+    border-radius: 0.2em;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
 .comment-date {
     font-size: 0.8em;
     color: #777;
-}
-.comment-text {
-    margin: 5px 0;
 }
