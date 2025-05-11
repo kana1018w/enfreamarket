@@ -61,10 +61,10 @@
     margin-right: 10px; /* 価格との間隔 */
     line-height: 1.2;
 }
-.product-price-fav {
+.product-price-fav-status {
     display: flex;
     align-items: center;
-    gap: 5px; /* 価格とお気に入りアイコンの間隔 */
+    gap: 10px;
     white-space: nowrap; /* 価格が改行されないように */
 }
 .product-price {

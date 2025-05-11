@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from interactions.models import Comment
+from interactions.models import Comment, Favorite
 from interactions.forms import CommentForm
 
 def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
@@ -203,19 +203,25 @@ def detail(request, pk):
     sub_images = product.images.filter(display_order__gt=0).order_by('display_order')
 
     
-    # 関連するコメントを取得
-    comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
-    comment_form = CommentForm()
-
     # ログインユーザーが出品者かどうかを判定するフラグ
     is_owner = False
     if request.user.is_authenticated and product.user == request.user:
         is_owner = True
 
+    # ログインユーザーがお気に入りしたかどうかを判定するフラグ
+    is_favorited = False
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
+
+    # 関連するコメントを取得
+    comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
+    comment_form = CommentForm()
+
     context = {
         'product': product,
-        'is_owner': is_owner,
         'sub_images': sub_images,
+        'is_owner': is_owner,
+        'is_favorited': is_favorited,
         'comments': comments,
         'comment_form': comment_form,
     }
@@ -313,12 +319,3 @@ def delete(request, pk):
         'product': product
     }
     return render(request, 'products/delete_confirm.html', context)
-
-
-# 気になるリスト
-def favorite_list(request): 
-    return render(request, 'products/favorite_list.html')
-
-# ご利用規約
-def terms(request):
-    return render(request, 'products/terms.html')

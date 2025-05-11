@@ -1,0 +1,131 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+{% endblock %}
+
+{% block page_title %}
+お気に入り
+{% endblock %}
+
+{% block back_or_breadcrumb %}
+< 戻る
+{% endblock %}
+
+{% block body_content %}
+<div class="mypage-container">
+    {# --- 左側メニューエリア --- #}
+    <div class="mypage-menu">
+        <div class="list-group">
+            <a href="{% url 'interactions:favorite_list' %}" class="list-group-item list-group-item-action custom-active">
+                お気に入り >
+            </a>
+            <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action">
+                出品した商品 >
+            </a>
+            <a href="{% url 'accounts:my_intents_given' %}" class="list-group-item list-group-item-action">
+                購入意思を示した商品 >
+            </a>
+            <a href="{% url 'accounts:my_intents_received' %}" class="list-group-item list-group-item-action">
+                購入意思を受けた商品 >
+            </a>
+            <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">
+                名前の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_display_name_edit' %}" class="list-group-item list-group-item-action">
+                表示名の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_email_edit' %}" class="list-group-item list-group-item-action">
+                メールアドレスの変更 >
+            </a>
+            <a href="{% url 'accounts:profile_password_edit' %}" class="list-group-item list-group-item-action">
+                パスワードの変更 >
+            </a>
+        </div>
+    </div>
+
+    {# --- 右側フォームエリア --- #}
+    <div class="mypage-info">
+        {% if favorites %}
+            <div class="list-group col-md-10 mx-auto">
+                {% for favorite_item in favorites %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            {# --- 商品画像 --- #}
+                            <div class="col-md-2 col-3">
+                                <a href="{% url 'products:product_detail' pk=favorite_item.product.pk %}">
+                                    {% if favorite_item.product.main_product_image %}
+                                        <img src="{{ favorite_item.product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
+                                    {% else %}
+                                        {# 代替画像 #}
+                                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 100px;">
+                                            <small>画像なし</small>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+    
+                            <div class="col-md-10 col-9" >
+                                <div class="row align-items-center">
+                                    {# --- 商品情報 --- #}
+                                    <div class="col-md-7 col-12">
+                                        <div class="product-title">
+                                            {# 商品名 #}
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'products:product_detail' pk=favorite_item.product.pk %}" class="text-decoration-none text-dark">
+                                                    {{ favorite_item.product.name|truncatechars:20 }}
+                                                </a>
+                                            </h6>
+                                        </div>
+                                        <div class="product-description small mt-2 "> {{ favorite_item.product.description }} </div>
+                                    </div>
+    
+                                    {# --- その他情報 --- #}
+                                    <div class="col-md-5 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                            {% if favorite_item.product.status == favorite_item.product.Status.FOR_SALE.value %}
+                                                {# 価格 #}
+                                                <span class="text-muted">¥{{ favorite_item.product.price|floatformat:0 }}</span>
+                                                {# お気に入り削除ボタン#}
+                                                <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=favorite_item.product.pk %}" class="ms-2">
+                                                    {% csrf_token %}
+                                                    {# このページに戻ってくるように 'next' パラメータを渡す #}
+                                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                                    <button type="submit" class="btn">
+                                                        <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            {# ステータス #}
+                                            <span class="status-badge {{ favorite_item.product.status_class }}">
+                                                {{ favorite_item.product.get_status_display }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {# 購入意思表示ボタン, 注釈 #}
+                            {% if favorite_item.product.status == favorite_item.product.Status.FOR_SALE.value %}
+                                <button type="button" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
+                                {# 「購入意思表示済」の表示 TODO #}
+                                <button type="button" class="btn btn-sm btn-primary-action" disabled>購入意思表示済</button>
+                            {% elif favorite_item.product.status == favorite_item.product.Status.IN_TRANSACTION.value %}
+                                <small class="text-muted">※他の方と取引中ため購入意思は表示できません。</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <p class="lead">お気に入り登録した商品はありません。</p>
+                <a href="{% url 'products:top' %}" class="btn btn-primary-action mt-3">商品を探しにいく</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

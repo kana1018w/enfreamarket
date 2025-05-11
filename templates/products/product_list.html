@@ -166,7 +166,12 @@
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
-                                            <span class="fav-icon-placeholder" title="お気に入りに追加"></span> {# TODO お気に入りに追加 #}
+                                            {# TODO 一旦アイコン統一, 後で処理実装 #}
+                                            {% if is_favorited %}
+                                                <i class="fas fa-heart text-muted" style="font-size: 1.5rem;"></i>
+                                            {% else %}
+                                                <i class="far fa-heart text-secondary" style="font-size: 1.5rem;"></i>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

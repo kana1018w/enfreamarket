@@ -51,9 +51,30 @@
         <section class="product-info-section">
             <div class="product-header">
                 <h1 class="product-name">{{ product.name }}</h1>
-                <div class="product-price-fav">
+                <div class="product-price-fav-status">
                     <span class="product-price">¥{{ product.price|intcomma }}</span>
-                    <span class="fav-icon-placeholder" title="お気に入りに追加"></span> {# TODO お気に入りに追加 #}
+                    
+                    {# --- お気に入りボタン --- #}
+                    {% if request.user.is_authenticated and not is_owner %}
+                        <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=product.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            {# 商品詳細ページに戻るように next パラメータを設定 #}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn btn-link p-0 border-0 fav-button">
+                                {% if is_favorited %}
+                                    {# Font Awesome: 塗りつぶしハート #}
+                                    <i class="fas fa-heart text-muted" style="font-size: 1.5rem;"></i>
+                                {% else %}
+                                    {# Font Awesome: 枠線ハート #}
+                                    <i class="far fa-heart text-secondary" style="font-size: 1.5rem;"></i>
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% elif not request.user.is_authenticated and not is_owner %}
+                         <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="fav-button">
+                            <i class="bi bi-heart text-secondary" style="font-size: 1.5rem;" title="お気に入りに追加するにはログインしてください"></i>
+                         </a>
+                    {% endif %}
                     
                     {# --- ステータス (取引中/売却済のみ表示) --- #}
                     {% if product.status == product.Status.FOR_SALE %}
