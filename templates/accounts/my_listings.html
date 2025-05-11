@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
 <link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
 {% endblock %}
@@ -15,71 +16,102 @@
 {% endblock %}
 
 {% block body_content %}
-<div class="container mt-3">
-    {% if products %}
-        <div class="list-group col-md-10 mx-auto">
-            {% for product in products %}
-                <div class="list-group-item">
-                    <div class="row align-items-center">
-                        {# --- 商品画像 --- #}
-                        <div class="col-md-2 col-3">
-                            <a href="{% url 'products:product_detail' pk=product.pk %}">
-                                {% if product.main_product_image %}
-                                    <img src="{{ product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
-                                {% else %} {# メイン画像は必須だが念の為 #}
-                                    {# 代替画像 #}
-                                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 100px;">
-                                        <small>画像なし</small>
-                                    </div>
-                                {% endif %}
-                            </a>
-                        </div>
+<div class="mypage-container">
+    {# --- 左側メニューエリア --- #}
+    <div class="mypage-menu">
+        <div class="list-group">
+            <a href="{% url 'interactions:favorite_list' %}" class="list-group-item list-group-item-action">
+                お気に入り >
+            </a>
+            <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action custom-active">
+                出品した商品 >
+            </a>
+            <a href="{% url 'accounts:my_intents_given' %}" class="list-group-item list-group-item-action">
+                購入意思を示した商品 >
+            </a>
+            <a href="{% url 'accounts:my_intents_received' %}" class="list-group-item list-group-item-action">
+                購入意思を受けた商品 >
+            </a>
+            <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">
+                名前の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_display_name_edit' %}" class="list-group-item list-group-item-action">
+                表示名の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_email_edit' %}" class="list-group-item list-group-item-action">
+                メールアドレスの変更 >
+            </a>
+            <a href="{% url 'accounts:profile_password_edit' %}" class="list-group-item list-group-item-action">
+                パスワードの変更 >
+            </a>
+        </div>
+    </div>
 
-                        <div class="col-md-10 col-9" >
-                            <div class="row align-items-center">
-                                {# --- 商品情報 --- #}
-                                <div class="col-md-7 col-12">
-                                    <div class="product-title">
-                                        {# 商品名 #}
-                                        <h6 class="mb-1">
-                                            <a href="{% url 'products:product_detail' pk=product.pk %}" class="text-decoration-none text-dark">
-                                                {{ product.name }}
-                                            </a>
-                                        </h6>
+    {# --- 右側フォームエリア --- #}
+    <div class="mypage-info">
+        {% if products %}
+            <div class="list-group col-md-10 mx-auto">
+                {% for product in products %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            {# --- 商品画像 --- #}
+                            <div class="col-md-2 col-3">
+                                <a href="{% url 'products:product_detail' pk=product.pk %}">
+                                    {% if product.main_product_image %}
+                                        <img src="{{ product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
+                                    {% else %} {# メイン画像は必須だが念の為 #}
+                                        {# 代替画像 #}
+                                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 100px;">
+                                            <small>画像なし</small>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+    
+                            <div class="col-md-10 col-9" >
+                                <div class="row align-items-center">
+                                    {# --- 商品情報 --- #}
+                                    <div class="col-md-7 col-12">
+                                        <div class="product-title">
+                                            {# 商品名 #}
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'products:product_detail' pk=product.pk %}" class="text-decoration-none text-dark">
+                                                    {{ product.name }}
+                                                </a>
+                                            </h6>
+                                        </div>
+                                        <div class="product-description small mt-2 "> {{ product.description }} </div>
                                     </div>
-                                    <div class="product-description small mt-2 "> {{ product.description }} </div>
-                                </div>
-
-                                {# --- その他情報 --- #}
-                                <div class="col-md-5 col-12">
-                                    <div class="d-flex justify-content-md-end align-items-center item-status-menu">
-                                        {% if product.status == product.Status.FOR_SALE.value %}
-                                            {# 価格 #}
-                                            <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
-                                            {# 編集ボタン#}
-                                            <a href="{% url 'products:product_edit' pk=product.pk %}" class="btn btn-secondary-action">
-                                                編集
-                                            </a>
-                                        {% endif %}
-                                        {# ステータス #}
-                                        <span class="status-badge {{ product.status_class }}">
-                                            {{ product.get_status_display }}
-                                        </span>
+    
+                                    {# --- その他情報 --- #}
+                                    <div class="col-md-5 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                            {% if product.status == product.Status.FOR_SALE.value %}
+                                                {# 価格 #}
+                                                <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
+                                                {# 編集ボタン#}
+                                                <a href="{% url 'products:product_edit' pk=product.pk %}" class="btn btn-secondary-action">
+                                                    編集
+                                                </a>
+                                            {% endif %}
+                                            {# ステータス #}
+                                            <span class="status-badge {{ product.status_class }}">
+                                                {{ product.get_status_display }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="text-center">
-            出品した商品はありません。
-        </div>
-        <div class="text-center mt-2">
-            <a href="{% url 'products:sell' %}" class="link-subtle">商品を出品する</a>
-        </div>
-    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <p class="lead">出品した商品はありません。</p>
+                <a href="{% url 'products:sell' %}" class="btn btn-primary-action mt-3">商品を出品する</a>
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
