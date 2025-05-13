@@ -76,6 +76,9 @@
                                     </div>
                                     <div class="col-md-7 col-12">
                                         <div class="d-flex align-items-center justify-content-between">
+                                            {# 価格 #}
+                                            <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
+                                            <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
                                             {# 商品の現在のステータスに基づいてボタンやメッセージを表示 #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
                                                 {# TODO: 取引開始ボタンをここに設置 #}
@@ -84,32 +87,19 @@
                                                     <input type="hidden" name="intent_id" value="{{ intent.pk }}">
                                                     <button type="submit" class="btn btn-sm btn-accent-action">取引を開始する</button>
                                                 </form>
-                                            {% elif intent.product.status == intent.product.Status.IN_TRANSACTION %}
-                                                {# 取引相手がこの意思表示のユーザーか確認するロジックが必要 #}
-                                                {% if intent.product.negotiating_user == intent.user %}
-                                                    <span class="status-badge status-in-transaction d-block mb-1">取引中</span>
-                                                    {# TODO: 取引完了ボタンをここに設置 #}
-                                                    <form method="POST" action="#">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="intent_id" value="{{ intent.pk }}">
-                                                        <button type="submit" class="btn btn-sm btn-accent-action">取引を完了する</button>
-                                                    </form>
-                                                {% else %}
-                                                    <span class="text-muted small d-block">他のユーザーと取引中です</span>
-                                                {% endif %}
-                                            {% elif intent.product.status == intent.product.Status.SOLD %}
-                                                {% if intent.product.negotiating_user == intent.user %}
-                                                    <span class="status-badge status-sold d-block">売却済 (この方と取引)</span>
-                                                {% else %}
-                                                    <span class="text-muted small d-block">売却済</span>
-                                                {% endif %}
+                                            {% elif intent.product.status == intent.product.Status.IN_TRANSACTION and intent.product.negotiating_user == intent.user %}
+                                                {# TODO: 取引完了ボタンをここに設置 #}
+                                                <form method="POST" action="#">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="intent_id" value="{{ intent.pk }}">
+                                                    <button type="submit" class="btn btn-sm btn-accent-action">取引を完了する</button>
+                                                </form>
                                             {% endif %}
-                                            <div class="ms-2 text-end small text-muted">
-                                                <div>意思表示者: {{ intent.user.display_name|default:intent.user.name }}</div>
-                                                <div>意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</div>
-                                            </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="ms-2 text-right small text-muted">
+                                    <span>意思表示者: {{ intent.user.display_name|default:intent.user.name }} / 意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</span>
                                 </div>
                             </div>
                         </div>

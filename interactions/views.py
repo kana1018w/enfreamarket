@@ -202,6 +202,32 @@ def received_purchase_intents_list(request):
         'product__main_product_image'
     ).order_by('-created_at')
 
+    for intent in received_intents:
+        if intent.product:
+            product = intent.product
+            if product.status == Product.Status.FOR_SALE:
+                product.status_class = "status-for-sale"
+                product.status_message_display = "販売中"
+            elif product.status == Product.Status.IN_TRANSACTION:
+                product.status_class = "status-in-transaction"
+                if product.negotiating_user == intent.user: # この意思表示者と取引中か
+                    product.status_message_display = f"{intent.user.display_name}さんと取引中"
+                elif product.negotiating_user: # 他の誰かと取引中か
+                    product.status_message_display = "他のユーザーと取引中"
+                else: # negotiating_userがいないが取引中 (通常はありえないが念のため)
+                    product.status_message_display = "取引中"
+            elif product.status == Product.Status.SOLD:
+                product.status_class = "status-sold"
+                if product.negotiating_user == intent.user:
+                    product.status_message_display = f"{intent.user.display_name}さんに売却済"
+                elif product.negotiating_user:
+                    product.status_message_display = "他のユーザーに売却済"
+                else: # negotiating_userがいないが売却済
+                    product.status_message_display = "売却済"
+            else:
+                product.status_class = ""
+                product.status_message_display = ""
+
     context = {
         'received_intents': received_intents,
     }

@@ -81,24 +81,22 @@
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
                                                 {# 販売中の場合はステータス＋取り消しボタン #}
                                                 <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
-                                                {% if intent.product.status == intent.product.Status.FOR_SALE %}
-                                                    <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                                        <button type="submit" class="btn">
-                                                            <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
-                                                        </button>
-                                                    </form>
-                                                {% endif %}
+                                                <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                                    <button type="submit" class="btn">
+                                                        <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                    </button>
+                                                </form>
                                             {% else %}
                                             {# それ以外の場合はステータス＋メッセージ#}
                                                 <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
                                             {% endif %}
                                         </div>
-                                        <div class="ms-1 text-right small text-muted" style="text-align: right;">
-                                            <div>意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</div>
-                                        </div>
                                     </div>
+                                </div>
+                                <div class="ms-1 text-right small text-muted" style="text-align: right;">
+                                    <span>出品者: {{ intent.product.user.display_name|default:intent.user.name }} / 意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</span>
                                 </div>
                             </div>
                         </div>

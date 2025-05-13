@@ -86,19 +86,17 @@
     
                                     {# --- その他情報 --- #}
                                     <div class="col-md-5 col-12">
-                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
-                                            {% if product.status == product.Status.FOR_SALE.value %}
-                                                {# 価格 #}
-                                                <span class="text-muted">¥{{ product.price|intcomma }}</span>
-                                                {# 編集ボタン#}
-                                                <a href="{% url 'products:product_edit' pk=product.pk %}" class="btn btn-secondary-action">
-                                                    編集
-                                                </a>
-                                            {% endif %}
+                                        <div class="d-flex justify-content-md-start align-items-center item-status-menu">
+                                            {# 価格 #}
+                                            <span class="text-muted">¥{{ product.price|intcomma }}</span>
                                             {# ステータス #}
                                             <span class="status-badge {{ product.status_class }}">
                                                 {{ product.get_status_display }}
                                             </span>
+
+                                            {% if product.status == product.Status.FOR_SALE.value %}
+                                                <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action"><i class="fas fa-pencil-alt"></i> 編集</a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
