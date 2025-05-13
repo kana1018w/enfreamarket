@@ -121,6 +121,22 @@ def add_purchase_intent(request, product_pk):
 @login_required
 @require_POST
 def delete_purchase_intent(request, product_pk):
+    """商品に対する購入意思表示を取り消す"""
+    product = get_object_or_404(Product, pk=product_pk)
+
+    # ログインユーザーがこの商品に対して行った PurchaseIntent を取得
+    try:
+        intent = PurchaseIntent.objects.get(user=request.user, product=product)
+    except PurchaseIntent.DoesNotExist:
+        messages.error(request, "この商品に対するあなたの購入意思表示が見つかりません。")
+        return redirect('products:product_detail', pk=product_pk)
+
+    intent_product_name = intent.product.name # メッセージ用の商品名
+    intent.delete()
+
+    messages.success(request, f'「{intent_product_name}」への購入意思表示を取り消しました。')
+
+    # 元の商品詳細ページにリダイレクト
     return redirect('products:product_detail', pk=product_pk)
 
 

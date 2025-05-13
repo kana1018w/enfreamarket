@@ -105,17 +105,20 @@
                 {% else %}
                     {% if product.status == product.Status.FOR_SALE %}
                         {% if is_purchase_intended %}
-                            <button type="button" class="btn btn-sm btn-danger-action" disabled>購入意思表示を取り消す</button>
-                            {# ここに「購入意思を取り消す」ボタンを後で追加 #}
-                            {# <form method="POST" action="{% url 'interactions:remove_purchase_intent' product_pk=product.pk %}"> ... </form> #}
+                            <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=product.pk %}" class="me-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger-action">購入意思を取り消す</button>
+                            </form>
                         {% else %}
                             <form method="POST" action="{% url 'interactions:add_purchase_intent' product_pk=product.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
                             </form>
                         {% endif %}
+
+                    {# 販売中以外の場合（表示されないはずだけど念の為） #}
                     {% elif product.status == product.Status.IN_TRANSACTION %}
-                        <p class="text-muted small">この商品は現在他の方と取引中です。</p>
+                        <p class="text-muted small">この商品は現在取引中です。</p>
                     {% elif product.status == product.Status.SOLD %}
                         <p class="text-muted small">この商品は売却済です。</p>
                     {% endif %}
