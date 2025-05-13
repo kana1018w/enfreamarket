@@ -61,11 +61,11 @@ button {
    → 削除などユーザーに注意を促すボタン
 ================================ */
 .btn-danger-action {
-    background-color: #f8b7b2;  /* 淡い赤 */
+    background-color: #e74c3c;
     color: #fff;
     border: none;
 }
 .btn-danger-action:hover {
-    background-color: #ec9a93;  /* やや濃い赤 */
+    background-color: #c0392b;
     color: #fff;
 }

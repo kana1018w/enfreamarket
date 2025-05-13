@@ -95,21 +95,32 @@
             </div>
 
             <div class="action-button-wrapper">
-            {% if is_owner %}
-                <div class="owner-actions">
-                    {% if product.status != product.Status.SOLD %}
-                        <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action">編集</a>
-                        <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger-action">削除</a>
+                {% if is_owner %}
+                    <div class="owner-actions">
+                        {% if product.status != product.Status.SOLD %}
+                            <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action"><i class="fas fa-pencil-alt"></i> 編集</a>
+                            <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger-action"><i class="fas fa-trash-alt"></i> 削除</a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {% if product.status == product.Status.FOR_SALE %}
+                        {% if is_purchase_intended %}
+                            <button type="button" class="btn btn-sm btn-danger-action" disabled>購入意思表示を取り消す</button>
+                            {# ここに「購入意思を取り消す」ボタンを後で追加 #}
+                            {# <form method="POST" action="{% url 'interactions:remove_purchase_intent' product_pk=product.pk %}"> ... </form> #}
+                        {% else %}
+                            <form method="POST" action="{% url 'interactions:add_purchase_intent' product_pk=product.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
+                            </form>
+                        {% endif %}
+                    {% elif product.status == product.Status.IN_TRANSACTION %}
+                        <p class="text-muted small">この商品は現在他の方と取引中です。</p>
+                    {% elif product.status == product.Status.SOLD %}
+                        <p class="text-muted small">この商品は売却済です。</p>
                     {% endif %}
-                </div>
-            {% else %}
-                {% if product.status == product.Status.FOR_SALE %}
-                    <button type="button" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
-                    {# 「購入意思表示済」の表示 TODO #}
-                    <button type="button" class="btn btn-sm btn-primary-action" disabled>購入意思表示済</button>
                 {% endif %}
-            {% endif %}
-            </div>
+                </div>
 
             <h2 class="description-title">商品説明</h2>
             <div class="description-content">

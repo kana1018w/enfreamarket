@@ -5,13 +5,13 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.urls import reverse
 from products.models import Product
-from .models import Comment, Favorite
+from .models import Comment, Favorite, PurchaseIntent
 from .forms import CommentForm
 
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
 def add_comment(request, product_pk):
-    """商品にコメントを投稿するビュー"""
+    """商品にコメントを投稿する"""
     product = get_object_or_404(Product, pk=product_pk) # コメント対象の商品を取得
     form = CommentForm(request.POST)
 
@@ -34,7 +34,7 @@ def add_comment(request, product_pk):
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
 def favorite_toggle(request, product_pk):
-    """お気に入り登録/解除ビュー"""
+    """お気に入り登録/解除"""
     product = get_object_or_404(Product, pk=product_pk)
     favorite, created = Favorite.objects.get_or_create(user=request.user, product=product) # created は新規作成時はTrue、既存のオブジェクトを取得時はFalse
 
@@ -60,7 +60,7 @@ def favorite_toggle(request, product_pk):
 
 @login_required
 def favorite_list(request):
-    """お気に入りした商品の一覧を表示するビュー"""
+    """お気に入りした商品の一覧を表示する"""
     # Favorite オブジェクトのリストを取得
     favorites = Favorite.objects.filter(user=request.user).select_related(
         'product__main_product_image', # Productからメイン画像を参照する
@@ -83,3 +83,62 @@ def favorite_list(request):
         'favorites': favorites, # Favoriteオブジェクトのリストを渡す
     }
     return render(request, 'interactions/favorite_list.html', context)
+
+
+@login_required
+@require_POST
+def add_purchase_intent(request, product_pk):
+    """商品に対する購入意思表示を作成する"""
+    product = get_object_or_404(Product, pk=product_pk)
+
+    # 自分が出品した商品には購入意思表示できない
+    if product.user == request.user:
+        messages.error(request, "ご自身が出品した商品には購入意思表示できません。")
+        return redirect('products:detail', pk=product_pk)
+
+    # 販売中の商品にしか購入意思表示できない
+    if product.status != Product.Status.FOR_SALE:
+        messages.error(request, "この商品は現在購入意思表示を受け付けていません。")
+        return redirect('products:product_detail', pk=product_pk)
+
+    # PurchaseIntentオブジェクトを作成 (get_or_create を使う)
+    # 既に意思表示済みの場合、created は False になる
+    intent, created = PurchaseIntent.objects.get_or_create(
+        user=request.user,
+        product=product
+    )
+
+    if created:
+        messages.success(request, f'「{product.name}」への購入意思を伝えました。')
+        # TODO: 出品者へのメール通知処理をここに追加
+
+    else:
+        # 既に意思表示済みの場合　（通りないはずだが）
+        messages.info(request, f'「{product.name}」には既に購入意思表示をしています。')
+
+    return redirect('products:product_detail', pk=product_pk)
+
+@login_required
+@require_POST
+def delete_purchase_intent(request, product_pk):
+    return redirect('products:product_detail', pk=product_pk)
+
+
+
+@login_required
+def received_purchase_intents_list(request):
+    """購入意思表示を受けた商品の一覧"""
+    # ログインユーザーが出品した商品に対する PurchaseIntent を取得
+    # Product の user フィールドがログインユーザーである PurchaseIntent を絞り込む
+    received_intents = PurchaseIntent.objects.filter(
+        product__user=request.user
+    ).select_related(
+        'product',
+        'user',
+        'product__main_product_image'
+    ).order_by('-created_at')
+
+    context = {
+        'received_intents': received_intents,
+    }
+    return render(request, 'interactions/received_purchase_intents_list.html', context)

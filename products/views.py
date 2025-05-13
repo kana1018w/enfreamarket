@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from interactions.models import Comment, Favorite
+from interactions.models import Comment, Favorite, PurchaseIntent
 from interactions.forms import CommentForm
 
 def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
@@ -213,6 +213,11 @@ def detail(request, pk):
     if request.user.is_authenticated:
         is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
 
+    # --- 購入意思表示状態の判定 ---
+    is_purchase_intended = False
+    if request.user.is_authenticated:
+        is_purchase_intended = PurchaseIntent.objects.filter(user=request.user, product=product).exists()
+
     # 関連するコメントを取得
     comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
     comment_form = CommentForm()
@@ -221,6 +226,7 @@ def detail(request, pk):
         'product': product,
         'sub_images': sub_images,
         'is_owner': is_owner,
+        'is_purchase_intended': is_purchase_intended,
         'is_favorited': is_favorited,
         'comments': comments,
         'comment_form': comment_form,
