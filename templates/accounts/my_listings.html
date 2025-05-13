@@ -1,5 +1,6 @@
 {% extends 'main_base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/mypage.css' %}">
@@ -26,10 +27,10 @@
             <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action custom-active">
                 出品した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_given' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:sent_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を示した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_received' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:received_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を受けた商品 >
             </a>
             <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">
@@ -88,7 +89,7 @@
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {% if product.status == product.Status.FOR_SALE.value %}
                                                 {# 価格 #}
-                                                <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
+                                                <span class="text-muted">¥{{ product.price|intcomma }}</span>
                                                 {# 編集ボタン#}
                                                 <a href="{% url 'products:product_edit' pk=product.pk %}" class="btn btn-secondary-action">
                                                     編集

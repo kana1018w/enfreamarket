@@ -1,5 +1,6 @@
 {% extends 'main_base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/mypage.css' %}">
@@ -25,10 +26,10 @@
             <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action">
                 出品した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_given' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:sent_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を示した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_received' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:received_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を受けた商品 >
             </a>
             <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">
@@ -85,9 +86,13 @@
                                     {# --- その他情報 --- #}
                                     <div class="col-md-5 col-12">
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                            {# 価格 #}
+                                            <span class="text-muted">¥{{ favorite_item.product.price|intcomma }}</span>
                                             {% if favorite_item.product.status == favorite_item.product.Status.FOR_SALE.value %}
-                                                {# 価格 #}
-                                                <span class="text-muted">¥{{ favorite_item.product.price|floatformat:0 }}</span>
+                                                {# ステータス #}
+                                                <span class="status-badge {{ favorite_item.product.status_class }}">
+                                                    {{ favorite_item.product.get_status_display }}
+                                                </span>
                                                 {# お気に入り削除ボタン#}
                                                 <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=favorite_item.product.pk %}" class="ms-2">
                                                     {% csrf_token %}
@@ -97,11 +102,10 @@
                                                         <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
                                                     </button>
                                                 </form>
+                                            {% else %}
+                                                {# ステータス #}
+                                                <span class="status-badge {{ favorite_item.product.status_class }}">{{ favorite_item.product.get_status_display }}</span>
                                             {% endif %}
-                                            {# ステータス #}
-                                            <span class="status-badge {{ favorite_item.product.status_class }}">
-                                                {{ favorite_item.product.get_status_display }}
-                                            </span>
                                         </div>
                                     </div>
                                 </div>

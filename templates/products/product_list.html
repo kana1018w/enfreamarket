@@ -165,7 +165,7 @@
                                     <div class="col-md-5 col-12">
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
-                                            <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
+                                            <span class="text-muted">¥{{ product.price|intcomma }}</span>
                                             {# TODO 一旦アイコン統一, 後で処理実装 #}
                                             {% if is_favorited %}
                                                 <i class="fas fa-heart text-muted" style="font-size: 1.5rem;"></i>
