@@ -136,9 +136,57 @@ def delete_purchase_intent(request, product_pk):
 
     messages.success(request, f'「{intent_product_name}」への購入意思表示を取り消しました。')
 
-    # 元の商品詳細ページにリダイレクト
-    return redirect('products:product_detail', pk=product_pk)
+    # リダイレクト先の決定
+    # 各画面でnextパラメータを送るので基本的にはそれに準ずる
+    # なかった場合は該当商品の商品詳細ページへリダイレクト
+    default_redirect = reverse('products:product_detail', kwargs={'pk': product_pk})
+    redirect_url = request.POST.get('next', default_redirect)
 
+    # 'next' が空文字列だった場合や予期せぬ値の場合
+    if not redirect_url:
+        redirect_url = default_redirect
+
+    return redirect(redirect_url)
+
+@login_required
+def sent_purchase_intents_list(request):
+    """自分が行った購入意思表示の一覧を表示する"""
+    # ログインユーザーが行った PurchaseIntent を取得
+    sent_intents = PurchaseIntent.objects.filter(
+        user=request.user # PurchaseIntent の user がログインユーザー
+    ).select_related(
+        'product',                     # PurchaseIntent -> Product
+        'product__main_product_image'  # PurchaseIntent -> Product -> ProductImage
+    ).order_by('-created_at')          # 新しい意思表示が上にくるように
+
+    # ビューでステータスに応じてメッセージを表示する
+    for intent in sent_intents:
+        if intent.product:
+            product = intent.product
+            if product.status == Product.Status.FOR_SALE:
+                product.status_class = "status-for-sale"
+                product.status_message_display = "販売中"
+            elif product.status == Product.Status.IN_TRANSACTION:
+                product.status_class = "status-in-transaction"
+                # 取引相手によってメッセージを変える
+                if product.negotiating_user == request.user:
+                    product.status_message_display = "取引中"
+                else:
+                    product.status_message_display = "他のユーザーと取引中"
+            elif product.status == Product.Status.SOLD:
+                product.status_class = "status-sold"
+                if product.negotiating_user == request.user:
+                    product.status_message_display = "購入済"
+                else:
+                    product.status_message_display = "他のユーザーに売却済"
+            else:
+                product.status_class = ""
+                product.status_message_display = ""
+
+    context = {
+        'sent_intents': sent_intents,
+    }
+    return render(request, 'interactions/sent_purchase_intents_list.html', context)
 
 
 @login_required

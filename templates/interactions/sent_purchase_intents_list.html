@@ -1,0 +1,116 @@
+{# interactions/templates/interactions/received_purchase_intents_list.html #}
+{% extends 'main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
+{% endblock %}
+
+{% block page_title %}
+購入意思を示した商品
+{% endblock %}
+
+{% block back_or_breadcrumb %}
+< 戻る
+{% endblock %}
+
+{% block body_content %}
+<div class="mypage-container">
+    {# --- 左側メニューエリア --- #}
+    <div class="mypage-menu">
+        <div class="list-group">
+            <a href="{% url 'interactions:favorite_list' %}" class="list-group-item list-group-item-action">
+                お気に入り >
+            </a>
+            <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action">
+                出品した商品 >
+            </a>
+            <a href="{% url 'interactions:sent_purchase_intents_list' %}" class="list-group-item list-group-item-action custom-active">
+                購入意思を示した商品 >
+            </a>
+            <a href="{% url 'interactions:received_purchase_intents_list' %}" class="list-group-item list-group-item-action">
+                購入意思を受けた商品 >
+            </a>
+            <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">
+                名前の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_display_name_edit' %}" class="list-group-item list-group-item-action">
+                表示名の変更 >
+            </a>
+            <a href="{% url 'accounts:profile_email_edit' %}" class="list-group-item list-group-item-action">
+                メールアドレスの変更 >
+            </a>
+            <a href="{% url 'accounts:profile_password_edit' %}" class="list-group-item list-group-item-action">
+                パスワードの変更 >
+            </a>
+        </div>
+    </div>
+
+    {# --- 右側コンテンツエリア --- #}
+    <div class="mypage-info">
+        {% if sent_intents %}
+            <div class="list-group col-md-10 mx-auto">
+                {% for intent in sent_intents %}
+                    <div class="list-group-item received-intent-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 col-3">
+                                <a href="{% url 'products:product_detail' pk=intent.product.pk %}">
+                                    {% if intent.product.main_product_image %}
+                                        <img src="{{ intent.product.main_product_image.image.url }}" class="img-fluid" alt="{{ intent.product.name }}">
+                                    {% else %}
+                                        <div class="bg-light text-white d-flex align-items-center justify-content-center" style="height:100px;"><small>画像なし</small></div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <div class="col-md-10 col-9" >
+                                <div class="row align-items-center">
+                                    <div class="col-md-7 col-12">
+                                        <h6 class="mb-1">
+                                            <a href="{% url 'products:product_detail' pk=intent.product.pk %}" class="text-decoration-none text-dark">
+                                                {{ intent.product.name }}
+                                            </a>
+                                        </h6>
+                                        <div class="product-description small mt-2 "> {{ intent.product.description }} </div>
+                                    </div>
+                                    <div class="col-md-5 col-12">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            {# 価格 #}
+                                            <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
+                                            {% if intent.product.status == intent.product.Status.FOR_SALE %}
+                                                {# 販売中の場合はステータス＋取り消しボタン #}
+                                                <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
+                                                {% if intent.product.status == intent.product.Status.FOR_SALE %}
+                                                    <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                                        <button type="submit" class="btn">
+                                                            <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            {% else %}
+                                            {# それ以外の場合はステータス＋メッセージ#}
+                                                <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ms-1 text-right small text-muted" style="text-align: right;">
+                                            <div>意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <p class="lead">購入意思表示を送った商品はありません。</p>
+                <a href="{% url 'products:top' %}" class="btn btn-primary-action mt-3">商品を探しにいく</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
