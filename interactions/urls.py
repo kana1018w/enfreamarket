@@ -15,4 +15,7 @@ urlpatterns = [
     path('product/<int:product_pk>/purchase_intent/delete/', views.delete_purchase_intent, name='delete_purchase_intent'),
     path('purchase_intents/received/', views.received_purchase_intents_list, name='received_purchase_intents_list'),
     path('purchase_intents/sent/', views.sent_purchase_intents_list, name='sent_purchase_intents_list'),
+
+    # 取引
+    path('purchase_intent/<int:intent_pk>/start_transaction/', views.start_transaction, name='start_transaction'),
 ]

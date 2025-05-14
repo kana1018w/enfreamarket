@@ -7,6 +7,7 @@ from django.urls import reverse
 from products.models import Product
 from .models import Comment, Favorite, PurchaseIntent
 from .forms import CommentForm
+from django.db import transaction
 
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
@@ -200,30 +201,33 @@ def received_purchase_intents_list(request):
         'product',
         'user',
         'product__main_product_image'
-    ).order_by('-created_at')
+    ).order_by('product__name', '-created_at')
 
     for intent in received_intents:
         if intent.product:
             product = intent.product
+            product.status_message_info = "" # ステータスに応じた補助メッセージ
             if product.status == Product.Status.FOR_SALE:
                 product.status_class = "status-for-sale"
                 product.status_message_display = "販売中"
             elif product.status == Product.Status.IN_TRANSACTION:
                 product.status_class = "status-in-transaction"
+                product.status_message_display = "取引中" # ステータスバッジ用
                 if product.negotiating_user == intent.user: # この意思表示者と取引中か
-                    product.status_message_display = f"{intent.user.display_name}さんと取引中"
+                    pass # 何も表示しない
                 elif product.negotiating_user: # 他の誰かと取引中か
-                    product.status_message_display = "他のユーザーと取引中"
+                    product.status_message_info = "他のユーザーと取引中"
                 else: # negotiating_userがいないが取引中 (通常はありえないが念のため)
-                    product.status_message_display = "取引中"
+                    pass 
             elif product.status == Product.Status.SOLD:
                 product.status_class = "status-sold"
-                if product.negotiating_user == intent.user:
-                    product.status_message_display = f"{intent.user.display_name}さんに売却済"
+                product.status_message_display = "売却済"
+                if product.negotiating_user == intent.user: # この意思表示者に売却済か
+                    pass
                 elif product.negotiating_user:
-                    product.status_message_display = "他のユーザーに売却済"
+                    product.status_message_info = "他のユーザーに売却済"
                 else: # negotiating_userがいないが売却済
-                    product.status_message_display = "売却済"
+                    product.status_message_info = ""
             else:
                 product.status_class = ""
                 product.status_message_display = ""
@@ -232,3 +236,42 @@ def received_purchase_intents_list(request):
         'received_intents': received_intents,
     }
     return render(request, 'interactions/received_purchase_intents_list.html', context)
+
+
+@login_required
+@require_POST
+def start_transaction(request, intent_pk):
+    """購入意思表示に基づいて取引を開始するビュー"""
+    # 対象の PurchaseIntent を取得
+    intent = get_object_or_404(PurchaseIntent, pk=intent_pk)
+    product = intent.product
+    buyer = intent.user # 購入意思表示をしたユーザー
+
+    # 権限チェック: ログインユーザーが商品の出品者であるか確認
+    if product.user != request.user:
+        messages.error(request, "この取引を開始する権限がありません。再度ログインしてください。")
+        return redirect('accounts:login')
+
+    # ステータスチェック: 商品が販売中であるか確認
+    if product.status != Product.Status.FOR_SALE:
+        messages.error(request, "この商品は既に取引中または売却済です。")
+        return redirect('interactions:received_purchase_intents_list')
+
+    try:
+        with transaction.atomic(): # 複数のDB操作をまとめて実行
+            # 1. 商品のステータスを「取引中」に更新
+            product.status = Product.Status.IN_TRANSACTION
+            # 2. 商品の取引相手 (negotiating_user) を設定
+            product.negotiating_user = buyer
+            product.save()
+
+            # TODO: 3. 購入者にメールで通知 (次のステップで実装)
+
+            messages.success(request, f"「{product.name}」について、{buyer.display_name}さんとの取引を開始しました。")
+
+    except Exception as e:
+        messages.error(request, f"取引開始処理中にエラーが発生しました: {e}")
+        # エラーログなども記録すると良い
+        print(f"Error during start_transaction: {e}")
+
+    return redirect('interactions:received_purchase_intents_list')

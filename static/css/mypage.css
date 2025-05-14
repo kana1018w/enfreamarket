@@ -1,7 +1,7 @@
 /* mypage */
 .mypage-container {
     display: flex; /* メニューと情報を横並びにする例 */
-    gap: 10px; /* 要素間の隙間 */
+    gap: 40px; /* 要素間の隙間 */
 }
 .mypage-menu {
     flex: 1; /* 幅の割合 (例) */

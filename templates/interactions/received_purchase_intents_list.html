@@ -51,7 +51,7 @@
     {# --- 右側コンテンツエリア --- #}
     <div class="mypage-info">
         {% if received_intents %}
-            <div class="list-group col-md-10 mx-auto">
+            <div class="list-group mx-auto">
                 {% for intent in received_intents %}
                     <div class="list-group-item received-intent-item">
                         <div class="row align-items-center">
@@ -82,9 +82,8 @@
                                             {# 商品の現在のステータスに基づいてボタンやメッセージを表示 #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
                                                 {# TODO: 取引開始ボタンをここに設置 #}
-                                                <form method="POST" action="#">
+                                                <form method="POST" action="{% url 'interactions:start_transaction' intent_pk=intent.pk %}">
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="intent_id" value="{{ intent.pk }}">
                                                     <button type="submit" class="btn btn-sm btn-accent-action">取引を開始する</button>
                                                 </form>
                                             {% elif intent.product.status == intent.product.Status.IN_TRANSACTION and intent.product.negotiating_user == intent.user %}
@@ -92,14 +91,20 @@
                                                 <form method="POST" action="#">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="intent_id" value="{{ intent.pk }}">
-                                                    <button type="submit" class="btn btn-sm btn-accent-action">取引を完了する</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary-action">取引を完了する</button>
                                                 </form>
+                                            {% else %}
+                                                {# 表示調整のため設置 #}
+                                                <button type="button" class="btn btn-sm btn-primary-action" style="visibility: hidden;">取引を完了する</button>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="ms-2 text-right small text-muted">
-                                    <span>意思表示者: {{ intent.user.display_name|default:intent.user.name }} / 意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</span>
+                                    {% if intent.product.status != intent.product.Status.FOR_SALE %}
+                                        <div>{{ intent.product.status_message_info }}</div>
+                                    {% endif %}
+                                    <div>意思表示者: {{ intent.user.display_name|default:intent.user.name }} / 意思表示日時: {{ intent.created_at|date:"Y/n/j H:i" }}</div>
                                 </div>
                             </div>
                         </div>
