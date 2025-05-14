@@ -76,10 +76,10 @@
                                     </div>
                                     <div class="col-md-7 col-12">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            {# 価格 #}
+                                            {# 価格, ステータス #}
                                             <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
                                             <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
-                                            {# 商品の現在のステータスに基づいてボタンやメッセージを表示 #}
+                                            {# 商品の現在のステータスに基づいてボタンを表示 #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
                                                 {# TODO: 取引開始ボタンをここに設置 #}
                                                 <form method="POST" action="{% url 'interactions:start_transaction' intent_pk=intent.pk %}">

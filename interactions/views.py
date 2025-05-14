@@ -164,22 +164,22 @@ def sent_purchase_intents_list(request):
     for intent in sent_intents:
         if intent.product:
             product = intent.product
+            product.status_message_info = "" # ステータスに応じた補助メッセージ
             if product.status == Product.Status.FOR_SALE:
                 product.status_class = "status-for-sale"
                 product.status_message_display = "販売中"
             elif product.status == Product.Status.IN_TRANSACTION:
                 product.status_class = "status-in-transaction"
-                # 取引相手によってメッセージを変える
                 if product.negotiating_user == request.user:
-                    product.status_message_display = "取引中"
+                    pass
                 else:
-                    product.status_message_display = "他のユーザーと取引中"
+                    product.status_message_info = "他のユーザーと取引中"
             elif product.status == Product.Status.SOLD:
                 product.status_class = "status-sold"
                 if product.negotiating_user == request.user:
-                    product.status_message_display = "購入済"
+                    pass
                 else:
-                    product.status_message_display = "他のユーザーに売却済"
+                    product.status_message_info = "他のユーザーに売却済"
             else:
                 product.status_class = ""
                 product.status_message_display = ""
