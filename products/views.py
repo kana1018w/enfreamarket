@@ -14,8 +14,12 @@ def product_list_view(request): # 関数名を変更 (例: top_view, product_lis
     """トップページ (商品一覧) ビュー"""
 
     # 1. 商品データの取得とフィルタリング
-    # Product.Status.ON_SALE の値はモデル定義に合わせてください。
-    queryset = Product.objects.filter(status=Product.Status.FOR_SALE).select_related(
+    queryset = Product.objects.filter(status=Product.Status.FOR_SALE)
+
+    if request.user.is_authenticated:
+        queryset = queryset.exclude(user=request.user) # 自分が出品したものを除外
+
+    queryset = queryset.select_related(
         'main_product_image',
         'product_category'
     ).order_by('-created_at')

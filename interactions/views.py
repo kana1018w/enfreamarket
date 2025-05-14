@@ -8,6 +8,9 @@ from products.models import Product
 from .models import Comment, Favorite, PurchaseIntent
 from .forms import CommentForm
 from django.db import transaction
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.core.mail import send_mail
 
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
@@ -22,6 +25,33 @@ def add_comment(request, product_pk):
         comment.user = request.user       # コメントとユーザーを紐付ける
         comment.save()
         messages.success(request, 'コメントを投稿しました。')
+
+        if product.user != request.user: # 出品者とコメント投稿者が異なる場合のみ通知
+            try:
+                subject = f'【園フリマ】「{product.name}」に新しいコメントがありました'
+                mail_context = {
+                    'product_owner_display_name': product.user.display_name or product.user.get_username(),
+                    'product_name': product.name,
+                    'commenter_display_name': request.user.display_name or request.user.get_username(),
+                    'comment_text': comment.content,
+                    'product_detail_url': request.build_absolute_uri(
+                        reverse('products:product_detail', kwargs={'pk': product.pk})
+                    ),
+                }
+                message_body = render_to_string('emails/new_comment_notification_email.txt', mail_context)
+                recipient_list = [product.user.email] # 出品者のメールアドレス
+
+                send_mail(
+                    subject,
+                    message_body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    recipient_list,
+                    fail_silently=False
+                )
+                print(f"New comment notification mail sent to {product.user.email} for product {product.name}") # 開発用
+            except Exception as e:
+                print(f"Error sending new comment notification email: {e}")
+                messages.warning(request, "コメントは投稿しましたが、出品者への通知メールの送信に失敗しました。")
     else:
         # コメント投稿は任意なのでエラーは発生しない
         # バリデーション追加した場合はここを修正
@@ -111,10 +141,35 @@ def add_purchase_intent(request, product_pk):
 
     if created:
         messages.success(request, f'「{product.name}」への購入意思を伝えました。')
-        # TODO: 出品者へのメール通知処理をここに追加
+        # 出品者へのメール通知処理
+        try:
+            subject = f'【園フリマ】「{product.name}」に購入意思表示がありました'
+            # メール本文をテンプレートから生成
+            mail_context = {
+                'user_display_name': request.user.display_name or request.user.get_username(), # 表示名がなければユーザー名
+                'product_name': product.name,
+                'received_intents_url': request.build_absolute_uri(
+                    reverse('interactions:received_purchase_intents_list')
+                ),
+            }
+            message_body = render_to_string('emails/purchase_intent_notification_email.txt', mail_context)
+            recipient_list = [product.user.email] # 出品者のメールアドレス
+
+            send_mail(
+                subject,
+                message_body,
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                fail_silently=False # 送信失敗時にエラーを発生させる (開発中はTrueでも良い)
+            )
+            print(f"Mail sent to {product.user.email} for product {product.name}")
+        except Exception as e:
+            # メール送信失敗時のエラーハンドリング (ログ記録など)
+            print(f"Error sending email for purchase intent: {e}")
+            messages.warning(request, "購入意思は伝えましたが、出品者への通知メールの送信に失敗しました。")
 
     else:
-        # 既に意思表示済みの場合　（通りないはずだが）
+        # 既に意思表示済みの場合　（通らないはずだが）
         messages.info(request, f'「{product.name}」には既に購入意思表示をしています。')
 
     return redirect('products:product_detail', pk=product_pk)
@@ -265,7 +320,30 @@ def start_transaction(request, intent_pk):
             product.negotiating_user = buyer
             product.save()
 
-            # TODO: 3. 購入者にメールで通知 (次のステップで実装)
+            # 3. 購入者にメールで通知
+            try:
+                subject = f'【園フリマ】「{product.name}」の取引が開始されました'
+                mail_context = {
+                    'buyer_display_name': buyer.display_name or buyer.get_username(),
+                    'product_name': product.name,
+                    'product_detail_url': request.build_absolute_uri(
+                        reverse('products:product_detail', kwargs={'pk': product.pk})
+                    ),
+                }
+                message_body = render_to_string('emails/transaction_started_email.txt', mail_context)
+                recipient_list = [buyer.email] # 購入者のメールアドレス
+
+                send_mail(
+                    subject,
+                    message_body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    recipient_list,
+                    fail_silently=False
+                )
+                print(f"Transaction started mail sent to {buyer.email} for product {product.name}") # 開発用
+            except Exception as e:
+                print(f"Error sending transaction started email: {e}")
+                messages.warning(request, "取引は開始しましたが、購入者への通知メールの送信に失敗しました。")
 
             messages.success(request, f"「{product.name}」について、{buyer.display_name}さんとの取引を開始しました。")
 
