@@ -81,21 +81,20 @@
                                             <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
                                             {# 商品の現在のステータスに基づいてボタンを表示 #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
-                                                {# TODO: 取引開始ボタンをここに設置 #}
+                                                {# 取引開始ボタン #}
                                                 <form method="POST" action="{% url 'interactions:start_transaction' intent_pk=intent.pk %}">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-sm btn-accent-action">取引を開始する</button>
                                                 </form>
                                             {% elif intent.product.status == intent.product.Status.IN_TRANSACTION and intent.product.negotiating_user == intent.user %}
-                                                {# TODO: 取引完了ボタンをここに設置 #}
-                                                <form method="POST" action="#">
+                                                {# 取引完了ボタン #}
+                                                <form method="POST" action="{% url 'interactions:complete_transaction' intent_pk=intent.pk %}" class="d-inline">
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="intent_id" value="{{ intent.pk }}">
-                                                    <button type="submit" class="btn btn-sm btn-primary-action">取引を完了する</button>
+                                                    <button type="submit" class="btn btn-sm btn-secondary-action">取引を完了する</button>
                                                 </form>
                                             {% else %}
                                                 {# 表示調整のため設置 #}
-                                                <button type="button" class="btn btn-sm btn-primary-action" style="visibility: hidden;">取引を完了する</button>
+                                                <button type="button" class="btn btn-sm btn-secondary-action" style="visibility: hidden;">取引を完了する</button>
                                             {% endif %}
                                         </div>
                                     </div>

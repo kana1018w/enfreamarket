@@ -18,4 +18,5 @@ urlpatterns = [
 
     # 取引
     path('purchase_intent/<int:intent_pk>/start_transaction/', views.start_transaction, name='start_transaction'),
+    path('purchase_intent/<int:intent_pk>/complete_transaction/', views.complete_transaction, name='complete_transaction'),
 ]

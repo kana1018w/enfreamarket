@@ -97,7 +97,7 @@
             <div class="action-button-wrapper">
                 {% if is_owner %}
                     <div class="owner-actions">
-                        {% if product.status != product.Status.SOLD %}
+                        {% if product.status == product.Status.FOR_SALE %}
                             <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action"><i class="fas fa-pencil-alt"></i> 編集</a>
                             <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger-action"><i class="fas fa-trash-alt"></i> 削除</a>
                         {% endif %}
@@ -146,28 +146,32 @@
                 {% endif %}
             </div>
 
-            <div class="comment-form-wrapper">
-                {% if request.user.is_authenticated %}
-                    <form method="POST" action="{% url 'interactions:add_comment' product_pk=product.pk %}">
-                        {% csrf_token %}
-                        <div class="mb-2">
-                            <p class="font-weight-bold mb-1">商品へのコメント</p>
-                            {{ comment_form.content }}
-                            {% if comment_form.content.help_text %}
-                                <small class="form-text text-muted">{{ comment_form.content.help_text }}</small>
-                            {% endif %}
-                            {% for error in comment_form.content.errors %}
-                                <li class="form-error">{{ error }}</li>
-                            {% endfor %}
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-secondary-action btn-sm mt-2">コメント送信</button>
-                        </div>
-                    </form>
-                {% else %}
-                    <p class="text-muted small">コメントするには<a href="{% url 'accounts:login' %}?next={{ request.path }}">ログイン</a>してください。</p>
-                {% endif %}
+            {% if product.status == product.Status.SOLD %}            
+                <p class="text-dangersmall">この商品は売り切れました。</p>
+            {% else %}
+                <div class="comment-form-wrapper">
+                    {% if request.user.is_authenticated %}
+                        <form method="POST" action="{% url 'interactions:add_comment' product_pk=product.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <p class="font-weight-bold mb-1">商品へのコメント</p>
+                                {{ comment_form.content }}
+                                {% if comment_form.content.help_text %}
+                                    <small class="form-text text-muted">{{ comment_form.content.help_text }}</small>
+                                {% endif %}
+                                {% for error in comment_form.content.errors %}
+                                    <li class="form-error">{{ error }}</li>
+                                {% endfor %}
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-secondary-action btn-sm mt-2">コメント送信</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <p class="text-muted small">コメントするには<a href="{% url 'accounts:login' %}?next={{ request.path }}">ログイン</a>してください。</p>
+                    {% endif %}
                 </div>
+            {% endif %}
         </section>
     </div>
 </div>

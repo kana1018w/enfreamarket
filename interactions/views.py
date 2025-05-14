@@ -241,7 +241,7 @@ def received_purchase_intents_list(request):
 @login_required
 @require_POST
 def start_transaction(request, intent_pk):
-    """購入意思表示に基づいて取引を開始するビュー"""
+    """購入意思表示に基づいて取引を開始ー"""
     # 対象の PurchaseIntent を取得
     intent = get_object_or_404(PurchaseIntent, pk=intent_pk)
     product = intent.product
@@ -273,5 +273,42 @@ def start_transaction(request, intent_pk):
         messages.error(request, f"取引開始処理中にエラーが発生しました: {e}")
         # エラーログなども記録すると良い
         print(f"Error during start_transaction: {e}")
+
+    return redirect('interactions:received_purchase_intents_list')
+
+
+@login_required
+@require_POST
+def complete_transaction(request, intent_pk):
+    """購入意思表示に基づいて取引を完了"""
+    # 対象の PurchaseIntent を取得
+    intent = get_object_or_404(PurchaseIntent, pk=intent_pk)
+    product = intent.product
+    buyer = intent.user
+
+    # 権限チェック: ログインユーザーが商品の出品者であるか確認
+    if product.user != request.user:
+        messages.error(request, "この取引を完了する権限がありません。再度ログインしてください。")
+        return redirect('accounts:login')
+
+    # ステータスチェック: 商品が「取引中」であり、かつ取引相手が正しいか確認
+    if not (product.status == Product.Status.IN_TRANSACTION and product.negotiating_user == buyer):
+        messages.error(request, "この取引は現在完了できる状態ではありません。")
+        return redirect('interactions:received_purchase_intents_list')
+
+    try:
+        with transaction.atomic():
+            # 1. 商品のステータスを「売却済」に更新
+            product.status = Product.Status.SOLD
+            # product.negotiating_user はそのまま (誰と取引したかの記録)
+            product.save()
+
+            # TODO: 2. 購入者と出品者にメールで通知 (次のステップで実装)
+
+            messages.success(request, f"「{product.name}」の {buyer.display_name}さんとの取引を完了しました。")
+
+    except Exception as e:
+        messages.error(request, f"取引完了処理中にエラーが発生しました: {e}")
+        print(f"Error during complete_transaction: {e}")
 
     return redirect('interactions:received_purchase_intents_list')
