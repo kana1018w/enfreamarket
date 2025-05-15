@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block back_or_breadcrumb %}
-＜戻る
+< 戻る
 {% endblock %}
 
 {% block body_content %}
@@ -20,13 +20,16 @@
     {# --- 左側メニューエリア --- #}
     <div class="mypage-menu">
         <div class="list-group">
+            <a href="{% url 'interactions:favorite_list' %}" class="list-group-item list-group-item-action">
+                お気に入り >
+            </a>
             <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action">
                 出品した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_given' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:sent_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を示した商品 >
             </a>
-            <a href="{% url 'accounts:my_intents_received' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'interactions:received_purchase_intents_list' %}" class="list-group-item list-group-item-action">
                 購入意思を受けた商品 >
             </a>
             <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action" aria-current="true">

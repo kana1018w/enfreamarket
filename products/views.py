@@ -7,13 +7,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from interactions.models import Comment, Favorite, PurchaseIntent
+from interactions.forms import CommentForm
 
 def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
     """トップページ (商品一覧) ビュー"""
 
     # 1. 商品データの取得とフィルタリング
-    # Product.Status.ON_SALE の値はモデル定義に合わせてください。
-    queryset = Product.objects.filter(status=Product.Status.FOR_SALE).select_related(
+    queryset = Product.objects.filter(status=Product.Status.FOR_SALE)
+
+    if request.user.is_authenticated:
+        queryset = queryset.exclude(user=request.user) # 自分が出品したものを除外
+
+    queryset = queryset.select_related(
         'main_product_image',
         'product_category'
     ).order_by('-created_at')
@@ -72,14 +78,26 @@ def product_list_view(request): # 関数名を変更 (例: top_view, product_lis
             if query_condition:
                  queryset = queryset.filter(query_condition)
 
-    # else:
-        # フォームが無効な場合 (例: price_min > price_max)、エラーはフォームオブジェクトに
-        # 格納されているので、テンプレート側で表示できる。
-        # クエリセットは初期状態のまま (フィルタリングしない)。
-        # print(search_form.errors) # デバッグ用にエラー表示
+    # ページ上の商品に対し、お気に入り状態を追加
+    products_for_page = list(queryset.select_related('main_product_image', 'product_category').order_by('-created_at'))
+
+    if request.user.is_authenticated:
+        # 現在のログインユーザーがお気に入り登録している全ての商品IDのセット
+        # 1. お気に入り登録済みの商品IDを取得, flat=True で値（product_id）が直接入ったリストを返す
+        # 2. set() で重複を取り除く
+        favorited_product_ids = set(
+            Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+        )
+        # 3.現在の商品のID (product.pk) が、取得したお気に入り商品IDのセット (favorited_product_ids) の中に含まれているかどうかを判定
+        # 含まれていれば True, 含まれていなければ False
+        for product in products_for_page:
+            product.is_favorited_by_current_user = product.pk in favorited_product_ids
+    else:
+        for product in products_for_page:
+            product.is_favorited_by_current_user = False
 
     # 3. ページネーション処理
-    paginator = Paginator(queryset, 10) # 1ページあたり10件表示
+    paginator = Paginator(products_for_page, 10) # 1ページあたり10件表示
     page_number = request.GET.get('page')
 
     try:
@@ -193,21 +211,41 @@ def detail(request, pk):
             'product_category',
             'main_product_image'
         ).prefetch_related(
-            'images' # ProductImage を逆参照 (related_name='images')
+            'images', # ProductImage を逆参照 (related_name='images')
+            'comments__user' # Comment を逆参照 (related_name='comments') 
         ),
         pk=pk
     )
     sub_images = product.images.filter(display_order__gt=0).order_by('display_order')
 
+    
     # ログインユーザーが出品者かどうかを判定するフラグ
     is_owner = False
     if request.user.is_authenticated and product.user == request.user:
         is_owner = True
 
+    # ログインユーザーがお気に入りしたかどうかを判定するフラグ
+    is_favorited = False
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
+
+    # 購入意思表示状態の判定
+    is_purchase_intended = False
+    if request.user.is_authenticated:
+        is_purchase_intended = PurchaseIntent.objects.filter(user=request.user, product=product).exists()
+
+    # 関連するコメントを取得
+    comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
+    comment_form = CommentForm()
+
     context = {
         'product': product,
-        'is_owner': is_owner,
         'sub_images': sub_images,
+        'is_owner': is_owner,
+        'is_purchase_intended': is_purchase_intended,
+        'is_favorited': is_favorited,
+        'comments': comments,
+        'comment_form': comment_form,
     }
 
     return render(request, 'products/detail.html', context)
@@ -303,12 +341,3 @@ def delete(request, pk):
         'product': product
     }
     return render(request, 'products/delete_confirm.html', context)
-
-
-# 気になるリスト
-def favorite_list(request): 
-    return render(request, 'products/favorite_list.html')
-
-# ご利用規約
-def terms(request):
-    return render(request, 'products/terms.html')

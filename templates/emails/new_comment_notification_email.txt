@@ -1,0 +1,15 @@
+{{ product_owner_display_name }}様
+
+あなたが出品している商品「{{ product_name }}」に新しいコメントが投稿されました。
+
+コメント内容:
+--------------------
+{{ commenter_display_name }}さんより:
+{{ comment_text }}
+--------------------
+
+▼商品詳細ページでコメントを確認する
+{{ product_detail_url }}
+
+---
+園フリマ運営

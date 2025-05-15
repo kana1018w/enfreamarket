@@ -165,8 +165,21 @@
                                     <div class="col-md-5 col-12">
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
-                                            <span class="text-muted">¥{{ product.price|floatformat:0 }}</span>
-                                            <span class="fav-icon-placeholder" title="お気に入りに追加"></span> {# TODO お気に入りに追加 #}
+                                            <span class="text-muted">¥{{ product.price|intcomma }}</span>
+                                            {# お気に入り #}
+                                            {% if request.user.is_authenticated and product.user != request.user %}
+                                            <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=product.pk %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                <button type="submit" class="btn btn-link p-0 border-0 fav-button-list" title="{% if product.is_favorited_by_current_user %}お気に入り解除{% else %}お気に入りに追加{% endif %}">
+                                                    {% if product.is_favorited_by_current_user %}
+                                                        <i class="fas fa-heart text-muted" style="font-size: 1.5rem;"></i>
+                                                    {% else %}
+                                                        <i class="far fa-heart text-secondary" style="font-size: 1.5rem;"></i>
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
