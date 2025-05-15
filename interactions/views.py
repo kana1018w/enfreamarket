@@ -114,19 +114,16 @@ def favorite_list(request):
                 product.status_message_info = ""
                 if product.status == Product.Status.FOR_SALE:
                     product.status_class = "status-for-sale"
-                    product.status_message_display = "販売中"
                 elif product.status == Product.Status.IN_TRANSACTION:
                     product.status_class = "status-in-transaction"
-                    product.status_message_display = "取引中"
                     if product.negotiating_user == request.user:
-                        pass
+                        product.status_message_info = "あなたが取引中です"
                     elif product.negotiating_user:
                         product.status_message_info = "他のユーザーと取引中のため、購入意思表示は出来ません"
                 elif product.status == Product.Status.SOLD:
                     product.status_class = "status-sold"
-                    product.status_message_display = "売却済"
                     if product.negotiating_user == request.user:
-                        pass
+                        product.status_message_info = "あなたが購入しました"
                     elif product.negotiating_user:
                         product.status_message_info = "他のユーザーに売却されました"
                 else:
@@ -253,21 +250,21 @@ def sent_purchase_intents_list(request):
         if intent.product:
             product = intent.product
             product.status_message_info = "" # ステータスに応じた補助メッセージ
+
             if product.status == Product.Status.FOR_SALE:
                 product.status_class = "status-for-sale"
-                product.status_message_display = "販売中"
             elif product.status == Product.Status.IN_TRANSACTION:
                 product.status_class = "status-in-transaction"
                 if product.negotiating_user == request.user:
-                    pass
+                    product.status_message_info = "あなたが取引中です"
                 else:
                     product.status_message_info = "他のユーザーと取引中"
             elif product.status == Product.Status.SOLD:
                 product.status_class = "status-sold"
                 if product.negotiating_user == request.user:
-                    pass
+                    product.status_message_info = "あなたが購入しました"
                 else:
-                    product.status_message_info = "他のユーザーに売却済"
+                    product.status_message_info = "他のユーザーに売却されました"
             else:
                 product.status_class = ""
                 product.status_message_display = ""
@@ -294,24 +291,24 @@ def received_purchase_intents_list(request):
     for intent in received_intents:
         if intent.product:
             product = intent.product
+            # 意思表示者の表示名
+            intended_user_display = intent.user.display_name or intent.user.name
+            
             product.status_message_info = "" # ステータスに応じた補助メッセージ
             if product.status == Product.Status.FOR_SALE:
                 product.status_class = "status-for-sale"
-                product.status_message_display = "販売中"
             elif product.status == Product.Status.IN_TRANSACTION:
                 product.status_class = "status-in-transaction"
-                product.status_message_display = "取引中" # ステータスバッジ用
                 if product.negotiating_user == intent.user: # この意思表示者と取引中か
-                    pass # 何も表示しない
+                    product.status_message_info = intended_user_display + " と取引中です"
                 elif product.negotiating_user: # 他の誰かと取引中か
                     product.status_message_info = "他のユーザーと取引中"
                 else: # negotiating_userがいないが取引中 (通常はありえないが念のため)
                     pass 
             elif product.status == Product.Status.SOLD:
                 product.status_class = "status-sold"
-                product.status_message_display = "売却済"
                 if product.negotiating_user == intent.user: # この意思表示者に売却済か
-                    pass
+                    product.status_message_info = intended_user_display + "に売却しました"
                 elif product.negotiating_user:
                     product.status_message_info = "他のユーザーに売却済"
                 else: # negotiating_userがいないが売却済

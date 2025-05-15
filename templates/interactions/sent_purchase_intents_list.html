@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-md-10 col-9" >
                                 <div class="row align-items-center">
-                                    <div class="col-md-7 col-12">
+                                    <div class="col-md-6 col-12">
                                         <h6 class="mb-1">
                                             <a href="{% url 'products:product_detail' pk=intent.product.pk %}" class="text-decoration-none text-dark">
                                                 {{ intent.product.name }}
@@ -74,25 +74,53 @@
                                         </h6>
                                         <div class="product-description small mt-2 "> {{ intent.product.description }} </div>
                                     </div>
-                                    <div class="col-md-5 col-12">
-                                        <div class="d-flex align-items-center justify-content-between">
+                                    <div class="col-md-6 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 , ステータス #}
                                             <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
-                                            <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
+                                            <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.get_status_display }}</span>
+                                            {# 取消ボタン #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
-                                                {# 取り消しボタン #}
+                                                {# 販売中なら常に表示 #}
                                                 <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.path }}">
-                                                    <button type="submit" class="btn">
-                                                        <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                    <button type="submit" class="btn p-0 border-0" title="購入意思を取り消す">
+                                                        <i class="fas fa-times text-muted"></i>
                                                     </button>
                                                 </form>
-                                            {% else %}
-                                            {# 表示調整のため設置 #}
-                                                <button type="submit" class="btn">
-                                                    <i class="fas fa-times text-muted" style="font-size: 1.5rem; visibility: hidden;"></i>
-                                                </button>
+                                            {% elif intent.product.status == intent.product.Status.IN_TRANSACTION %}
+                                                {# 取引相手が自分ではない場合のみ表示 #}
+                                                {% if intent.product.negotiating_user != intent.user %}
+                                                    <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                                        <button type="submit" class="btn p-0 border-0" title="購入意思を取り消す (他のユーザーと取引中)">
+                                                            <i class="fas fa-times text-muted"></i>
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn p-0 border-0">
+                                                        <i class="fas fa-times text-muted" style="visibility: hidden;"></i>
+                                                    </button>
+                                                    {# 下でメッセージを表示 #}
+                                                {% endif %}
+                                            {% elif intent.product.status == intent.product.Status.SOLD %}
+                                                {# 売却相手が自分ではないのみ場合 #}
+                                                {% if intent.product.negotiating_user != intent.user %}
+                                                    <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=intent.product.pk %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                                        <button type="submit" class="btn p-0 border-0" title="購入意思を取り消す (他のユーザーに売却済)">
+                                                            <i class="fas fa-times text-muted"></i>
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn p-0 border-0">
+                                                        <i class="fas fa-times text-muted" style="visibility: hidden;"></i>
+                                                    </button>
+                                                    {# 下でメッセージを表示 #}
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>

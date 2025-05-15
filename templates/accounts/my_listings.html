@@ -72,7 +72,7 @@
                             <div class="col-md-10 col-9" >
                                 <div class="row align-items-center">
                                     {# --- 商品情報 --- #}
-                                    <div class="col-md-7 col-12">
+                                    <div class="col-md-6 col-12">
                                         <div class="product-title">
                                             {# 商品名 #}
                                             <h6 class="mb-1">
@@ -85,8 +85,8 @@
                                     </div>
     
                                     {# --- その他情報 --- #}
-                                    <div class="col-md-5 col-12">
-                                        <div class="d-flex justify-content-md-start align-items-center item-status-menu">
+                                    <div class="col-md-6 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ product.price|intcomma }}</span>
                                             {# ステータス #}
@@ -94,9 +94,20 @@
                                                 {{ product.get_status_display }}
                                             </span>
 
+                                            {# 編集ボタン #}
                                             {% if product.status == product.Status.FOR_SALE.value %}
-                                                <a href="{% url 'products:product_edit' product.pk %}" class="btn btn-sm btn-secondary-action"><i class="fas fa-pencil-alt"></i> 編集</a>
+                                                <button type="button" class="btn btn p-0 border-0">
+                                                    <a href="{% url 'products:product_edit' product.pk %}"><i class="fas fa-pencil-alt text-muted"></i></a>
+                                                </button>
+                                            {% else %}
+                                            {# 表示調整のため設置 #}
+                                                <button type="button" class="btn btn p-0 border-0" style="visibility: hidden;">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
                                             {% endif %}
+                                        </div>
+                                        <div class="ms-2 mt-2 text-right small text-muted">
+                                            出品日時: {{ product.created_at }}
                                         </div>
                                     </div>
                                 </div>

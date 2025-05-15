@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-md-10 col-9" >
                                 <div class="row align-items-center">
-                                    <div class="col-md-5 col-12">
+                                    <div class="col-md-6 col-12">
                                         <h6 class="mb-1">
                                             <a href="{% url 'products:product_detail' pk=intent.product.pk %}" class="text-decoration-none text-dark">
                                                 {{ intent.product.name }}
@@ -74,11 +74,11 @@
                                         </h6>
                                         <div class="product-description small mt-2 "> {{ intent.product.description }} </div>
                                     </div>
-                                    <div class="col-md-7 col-12">
-                                        <div class="d-flex align-items-center justify-content-between">
+                                    <div class="col-md-6 col-12">
+                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格, ステータス #}
                                             <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
-                                            <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.status_message_display }}</span>
+                                            <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.get_status_display }}</span>
                                             {# 商品の現在のステータスに基づいてボタンを表示 #}
                                             {% if intent.product.status == intent.product.Status.FOR_SALE %}
                                                 {# 取引開始ボタン #}

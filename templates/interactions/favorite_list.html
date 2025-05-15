@@ -71,7 +71,7 @@
                             <div class="col-md-10 col-9" >
                                 <div class="row align-items-center">
                                     {# --- 商品情報 --- #}
-                                    <div class="col-md-7 col-12">
+                                    <div class="col-md-6 col-12">
                                         <div class="product-title">
                                             {# 商品名 #}
                                             <h6 class="mb-1">
@@ -84,19 +84,18 @@
                                     </div>
     
                                     {# --- その他情報 --- #}
-                                    <div class="col-md-5 col-12">
+                                    <div class="col-md-6 col-12">
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ favorite_item.product.price|intcomma }}</span>
                                             {# ステータス #}
-                                                <span class="status-badge {{ favorite_item.product.status_class }}">{{ favorite_item.product.status_message_display }}</span>
+                                                <span class="status-badge {{ favorite_item.product.status_class }}">{{ favorite_item.product.get_status_display }}</span>
                                             {# お気に入り削除ボタン#}
                                             <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=favorite_item.product.pk %}" class="ms-2">
                                                 {% csrf_token %}
-                                                {# このページに戻ってくるように 'next' パラメータを渡す #}
                                                 <input type="hidden" name="next" value="{{ request.path }}">
-                                                <button type="submit" class="btn">
-                                                    <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                <button type="submit" class="btn p-0 border-0">
+                                                    <i class="fas fa-times text-muted"></i>
                                                 </button>
                                             </form>
                                         </div>
