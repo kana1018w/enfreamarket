@@ -55,7 +55,6 @@ class PurchaseIntent(models.Model):
         verbose_name = '購入意思表示'
         verbose_name_plural = '購入意思表示'
         # 1人のユーザーは1つの商品に1回だけ購入意思表示できるように制約を追加 (必要に応じて)
-        # もし複数回意思表示できる仕様なら、この制約は不要です。
         constraints = [
             models.UniqueConstraint(fields=['user', 'product'], name='unique_purchase_intent')
         ]
