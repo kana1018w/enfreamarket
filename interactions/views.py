@@ -95,23 +95,46 @@ def favorite_list(request):
     # Favorite オブジェクトのリストを取得
     favorites = Favorite.objects.filter(user=request.user).select_related(
         'product__main_product_image', # Productからメイン画像を参照する
-    ).order_by('-created_at') # 新しくお気に入りしたものが上にくるように
+    ).order_by('-created_at') # 新しくお気に入りしたものが上にくるよう
 
-    # お気に入り商品のステータスを表示するため、Product オブジェクトにステータスに応じたCSSクラスを追加
-    for fav_item in favorites:
-        if fav_item.product:
-            product = fav_item.product # Productオブジェクトへのショートカット
-            if product.status == Product.Status.FOR_SALE:
-                product.status_class = "status-for-sale"
-            elif product.status == Product.Status.IN_TRANSACTION:
-                product.status_class = "status-in-transaction"
-            elif product.status == Product.Status.SOLD:
-                product.status_class = "status-sold"
-            else:
-                product.status_class = ""
+    # 表示する各お気に入り商品に対して、購入意思表示状態を付与
+    if request.user.is_authenticated: # ログインしている前提のページだが念のため
+        # ログインユーザーが購入意思表示している商品IDのセットを取得
+        purchase_intended_product_ids = set(
+            PurchaseIntent.objects.filter(user=request.user).values_list('product_id', flat=True)
+        )
+        for fav_item in favorites:
+            if fav_item.product: # productが存在することを確認
+                product = fav_item.product
+
+                # 購入意思表示状態を追加
+                product.is_purchase_intended_by_current_user = product.pk in purchase_intended_product_ids
+
+                # ステータスクラスとメッセージの設定
+                product.status_message_info = ""
+                if product.status == Product.Status.FOR_SALE:
+                    product.status_class = "status-for-sale"
+                    product.status_message_display = "販売中"
+                elif product.status == Product.Status.IN_TRANSACTION:
+                    product.status_class = "status-in-transaction"
+                    product.status_message_display = "取引中"
+                    if product.negotiating_user == request.user:
+                        pass
+                    elif product.negotiating_user:
+                        product.status_message_info = "他のユーザーと取引中のため、購入意思表示は出来ません"
+                elif product.status == Product.Status.SOLD:
+                    product.status_class = "status-sold"
+                    product.status_message_display = "売却済"
+                    if product.negotiating_user == request.user:
+                        pass
+                    elif product.negotiating_user:
+                        product.status_message_info = "他のユーザーに売却されました"
+                else:
+                    product.status_class = ""
+                    product.status_message_display = ""
 
     context = {
-        'favorites': favorites, # Favoriteオブジェクトのリストを渡す
+        'favorites': favorites,
     }
     return render(request, 'interactions/favorite_list.html', context)
 
@@ -172,7 +195,17 @@ def add_purchase_intent(request, product_pk):
         # 既に意思表示済みの場合　（通らないはずだが）
         messages.info(request, f'「{product.name}」には既に購入意思表示をしています。')
 
-    return redirect('products:product_detail', pk=product_pk)
+    # リダイレクト先の決定
+    # 各画面でnextパラメータを送るので基本的にはそれに準ずる
+    # なかった場合は該当商品の商品詳細ページへリダイレクト
+    default_redirect = reverse('products:product_detail', kwargs={'pk': product_pk})
+    redirect_url = request.POST.get('next', default_redirect)
+
+    # 'next' が空文字列だった場合や予期せぬ値の場合
+    if not redirect_url:
+        redirect_url = default_redirect
+
+    return redirect(redirect_url)
 
 @login_required
 @require_POST

@@ -88,38 +88,40 @@
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ favorite_item.product.price|intcomma }}</span>
+                                            {# ステータス #}
+                                                <span class="status-badge {{ favorite_item.product.status_class }}">{{ favorite_item.product.status_message_display }}</span>
+                                            {# お気に入り削除ボタン#}
+                                            <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=favorite_item.product.pk %}" class="ms-2">
+                                                {% csrf_token %}
+                                                {# このページに戻ってくるように 'next' パラメータを渡す #}
+                                                <input type="hidden" name="next" value="{{ request.path }}">
+                                                <button type="submit" class="btn">
+                                                    <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="ms-2 mt-2 text-right small text-muted">
                                             {% if favorite_item.product.status == favorite_item.product.Status.FOR_SALE.value %}
-                                                {# ステータス #}
-                                                <span class="status-badge {{ favorite_item.product.status_class }}">
-                                                    {{ favorite_item.product.get_status_display }}
-                                                </span>
-                                                {# お気に入り削除ボタン#}
-                                                <form method="POST" action="{% url 'interactions:favorite_toggle' product_pk=favorite_item.product.pk %}" class="ms-2">
-                                                    {% csrf_token %}
-                                                    {# このページに戻ってくるように 'next' パラメータを渡す #}
-                                                    <input type="hidden" name="next" value="{{ request.path }}">
-                                                    <button type="submit" class="btn">
-                                                        <i class="fas fa-times text-muted" style="font-size: 1.5rem;"></i>
-                                                    </button>
-                                                </form>
+                                                {% if favorite_item.product.is_purchase_intended_by_current_user %}
+                                                    <form method="POST" action="{% url 'interactions:delete_purchase_intent' product_pk=favorite_item.product.pk %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger-action">購入意思を取り消す</button>
+                                                    </form>
+                                                {% else %}
+                                                    <form method="POST" action="{% url 'interactions:add_purchase_intent' product_pk=favorite_item.product.pk %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                                        <button type="submit" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
+                                                    </form>
+                                                {% endif %}
                                             {% else %}
-                                                {# ステータス #}
-                                                <span class="status-badge {{ favorite_item.product.status_class }}">{{ favorite_item.product.get_status_display }}</span>
+                                                <div>{{ favorite_item.product.status_message_info }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            {# 購入意思表示ボタン, 注釈 #}
-                            {% if favorite_item.product.status == favorite_item.product.Status.FOR_SALE.value %}
-                                <button type="button" class="btn btn-sm btn-accent-action">購入意思表示を送る</button>
-                                {# 「購入意思表示済」の表示 TODO #}
-                                <button type="button" class="btn btn-sm btn-primary-action" disabled>購入意思表示済</button>
-                            {% elif favorite_item.product.status == favorite_item.product.Status.IN_TRANSACTION.value %}
-                                <small class="text-muted">※他の方と取引中ため購入意思は表示できません。</small>
-                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
