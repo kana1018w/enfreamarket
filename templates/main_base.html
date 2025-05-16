@@ -8,9 +8,24 @@
       </a>
     </div>
     <nav class="navbar navbar-expand">
-      <ul class="navbar-nav d-flex flex-row">
+      <ul class="navbar-nav d-flex flex-row align-items-center">
         {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:mypage' %}">マイページ</a></li>
+          {# --- マイページ (ドロップダウンメニュー) --- #}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMypage" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">マイページ</a> {# ページ遷移はしないので、href="#" #}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMypage">
+                <a class="dropdown-item" href="{% url 'interactions:favorite_list' %}">お気に入り</a>
+                <a class="dropdown-item" href="{% url 'accounts:my_listings' %}">出品した商品</a>
+                <a class="dropdown-item" href="{% url 'interactions:sent_purchase_intents_list' %}">購入意思を示した商品</a>
+                <a class="dropdown-item" href="{% url 'interactions:received_purchase_intents_list' %}">購入意思を受けた商品</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'accounts:profile_name_edit' %}">名前の変更</a>
+                <a class="dropdown-item" href="{% url 'accounts:profile_display_name_edit' %}">表示名の変更</a>
+                <a class="dropdown-item" href="{% url 'accounts:profile_email_edit' %}">メールアドレスの変更</a>
+                <a class="dropdown-item" href="{% url 'accounts:profile_password_edit' %}">パスワードの変更</a>
+            </div>
+          </li>
+
           <li class="nav-item"><a class="nav-link" href="{% url 'products:sell' %}">出品</a></li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'interactions:favorite_list' %}" title="お気に入り">
@@ -20,10 +35,10 @@
           <li class="nav-item">
             <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn btn-danger-action">ログアウト</button>
+                <button type="submit" class="btn btn-danger-action">ログアウト</button>
             </form>
           </li>
-          {% else %}
+        {% else %}
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">ログイン</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:signup' %}">新規登録</a></li>
         {% endif %}
