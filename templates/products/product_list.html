@@ -16,9 +16,10 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'products:top' %}" class="link-subtle">商品一覧</a></li>
-            {% if selected_category_for_breadcrumb %}
-                <li class="breadcrumb-item">{{ selected_category_for_breadcrumb }}</li>
-                <li class="breadcrumb-item"><a href="#" class="link-subtle">{{ selected_category_for_breadcrumb }}</a></li>
+            {% if selected_category_for_breadcrumb_obj %}
+                <li class="breadcrumb-item active" aria-current="page"> {# ★ 最後の項目なので active に #}
+                    <a href="{% url 'products:top' %}?category={{ selected_category_for_breadcrumb_obj.pk }}" class="link-subtle">{{ selected_category_for_breadcrumb_obj.name }}</a>
+                </li>
             {% endif %}
         </ol>
     </nav>
@@ -130,6 +131,12 @@
 
         {# --- 右コンテンツエリア: 商品一覧 --- #}
         <main class="product-list-items">
+            {# --- キーワード検索の場合 --- #}
+            <div class="text-right">
+                {% if request.GET.keyword %}
+                    <span class="text-muted">キーワード:「{{ request.GET.keyword }}」の検索結果</span>
+                {% endif %}
+            </div>
             {% if products %}
             <div class="list-group mx-auto">
                 {% for product in products %}
@@ -180,6 +187,10 @@
                                                 </button>
                                             </form>
                                             {% endif %}
+                                        </div>
+                                        <div class="ms-2 text-right small text-muted">
+                                            <div class="text-muted">サイズ:{{ product.get_size_display }} </div>
+                                            <div class="text-muted">状態:{{ product.get_condition_display }}</div>
                                         </div>
                                     </div>
                                 </div>
