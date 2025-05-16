@@ -25,7 +25,7 @@ def product_list_view(request): # 関数名を変更 (例: top_view, product_lis
     ).order_by('-created_at')
 
     # 検索結果を表示しない時用に変数の初期化
-    selected_category_for_breadcrumb = None
+    selected_category_for_breadcrumb_obj = None
 
     # 2. 検索フォームの処理
     search_form = ProductSearchForm(request.GET or None)
@@ -49,7 +49,7 @@ def product_list_view(request): # 関数名を変更 (例: top_view, product_lis
         if categories: # 何かカテゴリが選択されていれば
             queryset = queryset.filter(product_category__in=categories)
             if categories.exists(): # 選択されたカテゴリが1つ以上あれば
-                selected_category_for_breadcrumb = categories.first().name # 最初のカテゴリ名
+                selected_category_for_breadcrumb_obj = categories.first() # 最初のカテゴリオブジェクト
 
         # --- 価格帯絞り込み ---
         price_min = search_form.cleaned_data.get('price_min')
@@ -112,7 +112,7 @@ def product_list_view(request): # 関数名を変更 (例: top_view, product_lis
     context = {
         'products': products_on_page, # 現在のページの商品リスト
         'search_form': search_form,   # 絞り込み検索フォーム (後で追加)
-        'selected_category_for_breadcrumb': selected_category_for_breadcrumb, # パンクズリストのカテゴリ表示で使用
+        'selected_category_for_breadcrumb_obj': selected_category_for_breadcrumb_obj, # パンクズリストのカテゴリ表示で使用
     }
     return render(request, 'products/product_list.html', context)
 

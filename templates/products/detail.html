@@ -16,7 +16,11 @@
     <nav aria-label="breadcrumb"">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'products:top' %}" class="link-subtle">商品一覧</a></li>
-            <li class="breadcrumb-item"><a href="#" class="link-subtle">{{ product.product_category.name }}</a></li> {# TODO #}
+            {% if product.product_category %}
+                <li class="breadcrumb-item">
+                    <a href="{% url 'products:top' %}?category={{ product.product_category.pk }}" class="link-subtle">{{ product.product_category.name }}</a>
+                </li>
+            {% endif %}
             <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:10 }}</li> {# 商品名を短縮表示 #}
         </ol>
     </nav>
