@@ -20,12 +20,20 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
+from core.views import portfolio_view
+
+# 園フリマアプリケーション用
+enfreamarket_patterns = [
+    path('product/', include('products.urls')),
+    path('account/', include('accounts.urls')),
+    path('interaction/', include('interactions.urls')),
     path('core/', include('core.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('products/', include('products.urls')),
-    path('interactions/', include('interactions.urls')),
+]
+
+urlpatterns = [
+    path('', portfolio_view, name='portfolio'),
+    path('admin/', admin.site.urls),
+    path('enfreamarket/', include(enfreamarket_patterns)), # 園フリマアプリ全体にプレフィックスを適用
 ]
 
 if settings.DEBUG:
