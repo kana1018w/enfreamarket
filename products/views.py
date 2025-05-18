@@ -10,7 +10,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from interactions.models import Comment, Favorite, PurchaseIntent
 from interactions.forms import CommentForm
 
-def product_list_view(request): # 関数名を変更 (例: top_view, product_list_view などでも可)
+@login_required
+def product_list_view(request):
     """トップページ (商品一覧) ビュー"""
 
     # 1. 商品データの取得とフィルタリング
