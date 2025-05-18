@@ -1,0 +1,111 @@
+{% extends "main_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block page_title %}
+園フリマとは
+{% endblock %}
+
+{% block body_content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+
+            <header class="text-center mb-5">
+                <p class="lead">
+                    同じ幼稚園に通う保護者同士で<br>中古の制服や園指定の用品を安心して売買できるクローズドなWebアプリです。
+                </p>
+                <p class="text-muted">
+                    成長や転園によって使わなくなった園用品を、必要な方へ譲ることができます。<br>
+                    誰かの「不要」が、誰かの「ちょうどいい」に変わる。<br>
+                    園フリマは、そんなあたたかな循環をつくりたく誕生しました。
+                </p>
+            </header>
+
+            <hr class="my-5">
+
+            <section class="mb-5">
+                <h4 class="text-center mb-4">園フリマでできること</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">安心のクローズド環境</h5>
+                                <p class="card-text small">園ごとの認証コードでログイン。同じ園の保護者だけが参加できる、安心の環境です。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-search-dollar fa-3x text-info mb-3"></i>
+                                <h5 class="card-title">簡単検索＆出品</h5>
+                                <p class="card-text small">園指定の用品をすぐに探せ、出品もスマホから数分で完了！気軽に利用できます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">安全なコミュニケーション</h5>
+                                <p class="card-text small">アプリ内コメント機能で、購入希望者と出品者が安全にやり取りできます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-recycle fa-3x text-warning mb-3"></i>
+                                <h5 class="card-title">エコな循環</h5>
+                                <p class="card-text small">不要になったものを次に必要とする人へ。資源を大切にするエコな活動にも繋がります。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="my-5">
+
+            <section class="mb-5">
+                <h4 class="text-center mb-4">こんな方におすすめ</h4>
+                <div class="list-group text-center">
+                    <div class="list-group-item d-flex flex-column align-items-center">
+                        <h5 class="mb-1 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-box-open text-success mr-2"></i>
+                            まだ使える用品が余っている方
+                        </h5>
+                        <p class="mb-1 small">転園・卒園で、まだきれいな制服や用品。捨てるのはもったいないと感じている方に。</p>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column align-items-center">
+                        <h5 class="mb-1 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-piggy-bank text-info mr-2"></i>
+                            費用を抑えて揃えたい方
+                        </h5>
+                        <p class="mb-1 small">入園準備やサイズアップで、できるだけ費用を抑えたいと考えている方に。</p>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column align-items-center">
+                        <h5 class="mb-1 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-users text-primary mr-2"></i>
+                            信頼できる相手と取引したい方
+                        </h5>
+                        <p class="mb-1 small">知らない人とのやり取りは不安。同じ園の保護者同士なら安心して取引できます。</p>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="logo-area text-center">
+                <a href="{% url 'products:top' %}">
+                    <img src="{% static 'img/header_logo.png' %}" alt="園フリマロゴ" class="img-fluid" style="max-width: 300px; height: auto;">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+.card,.list-group-item {
+    border: none;
+    transition: transform .2s;
+}
+
+/* アイコンの色 */
+.text-success {
+color: #87cbb5 !important;
+}
+
+.text-info {
+    color: #9ac7e0 !important;
+}
+
+.text-primary {
+    color: #b4a9d6 !important;
+}
+
+.text-warning {
+    color: #f7c67c !important;
+}
