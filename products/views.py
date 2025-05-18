@@ -262,13 +262,36 @@ def edit(request, pk):
 
     if request.method == 'POST':
         # 編集データを取得
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
 
         if form.is_valid():
             try:
-                # 複数のフィールド更新のため、トランザクションを開始
                 with transaction.atomic():
-                    form.save()
+                    # テキストベースのフィールドを保存
+                    updated_product = form.save(commit=False) # まだDBには保存しない
+
+                    # メイン画像の更新処理
+                    new_main_image_file = form.cleaned_data.get('main_image') # フォームから新しい画像ファイルを取得
+
+                    if new_main_image_file: # 新しい画像がアップロードされた場合
+                        # 1. 既存のメイン画像を削除
+                        if product.main_product_image:
+                            print(f"Debug: Existing main image (ID: {product.main_product_image.pk}) will be deleted.")
+                            # まずファイルシステムから画像ファイルを削除
+                            product.main_product_image.image.delete(save=False) # save=False でDB更新はしない
+                            # 次に ProductImage レコードを削除
+                            product.main_product_image.delete()
+                            updated_product.main_product_image = None # 一旦Noneにしておく
+
+                        # 2. 新しい ProductImage を作成して紐付ける
+                        new_pi = ProductImage.objects.create(
+                            product=updated_product, # この時点ではまだ updated_product は保存されていないが、後で保存される
+                            image=new_main_image_file,
+                            display_order=0
+                        )
+                        updated_product.main_product_image = new_pi
+                    # 全ての変更をDBに保存
+                    updated_product.save()
 
                 messages.success(request, '商品情報を更新しました。')
                 return redirect('accounts:my_listings')

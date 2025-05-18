@@ -129,7 +129,7 @@ class ProductForm(forms.ModelForm):
         # 一旦 編集では写真の編集機能を実装しないので、main_image を非必須にする
         if is_edit:
             self.fields['main_image'].required = False
-            self.fields['main_image'].help_text = '現在の画像を変更する場合のみ、新しい画像をアップロードしてください。'
+            self.fields['main_image'].help_text = '現在のメイン画像を変更する場合は、新しい画像をアップロードしてください。空のまま送信すると現在の画像が維持されます。'
         else:
             # 新規出品時
             self.fields['main_image'].required = True
