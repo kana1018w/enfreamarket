@@ -14,6 +14,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMypage" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">マイページ</a> {# ページ遷移はしないので、href="#" #}
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMypage">
+                <a class="dropdown-item" href="{% url 'accounts:mypage' %}">マイページ</a>
                 <a class="dropdown-item" href="{% url 'interactions:favorite_list' %}">お気に入り</a>
                 <a class="dropdown-item" href="{% url 'accounts:my_listings' %}">出品した商品</a>
                 <a class="dropdown-item" href="{% url 'interactions:sent_purchase_intents_list' %}">購入意思を示した商品</a>

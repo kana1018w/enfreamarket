@@ -1,0 +1,31 @@
+<div class="mypage-menu">
+    <div class="list-group">
+        <a href="{% url 'accounts:mypage' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'mypage' %}custom-active{% endif %}">
+            <span>マイページ</span><span>></span>
+        </a>
+        <a href="{% url 'interactions:favorite_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'favorites' %}custom-active{% endif %}">
+            <span>お気に入り</span><span>></span>
+        </a>
+        <a href="{% url 'accounts:my_listings' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'my_listings' %}custom-active{% endif %}">
+            <span>出品した商品</span><span>></span>
+        </a>
+        <a href="{% url 'interactions:sent_purchase_intents_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'sent_intents' %}custom-active{% endif %}">
+            <span>購入意思を示した商品</span><span>></span>
+        </a>
+        <a href="{% url 'interactions:received_purchase_intents_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'received_intents' %}custom-active{% endif %}">
+            <span>購入意思を受けた商品</span><span>></span>
+        </a>
+        <a href="{% url 'accounts:profile_name_edit' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'profile_name_edit' %}custom-active{% endif %}">
+            <span>名前の変更</span><span>></span>
+        </a>
+        <a href="{% url 'accounts:profile_display_name_edit' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'profile_display_name_edit' %}custom-active{% endif %}">
+            <span>表示名の変更</span><span>></span>
+        </a>
+        <a href="{% url 'accounts:profile_email_edit' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'profile_email_edit' %}custom-active{% endif %}">
+            <span>メールアドレスの変更</span><span>></span>
+        </a>
+        <a href="{% url 'accounts:profile_password_edit' %}" class="list-group-item list-group-item-action d-flex justify-content-between {% if active_mypage_menu == 'profile_password_edit' %}custom-active{% endif %}">
+            <span>パスワードの変更</span><span>></span>
+        </a>
+    </div>
+</div>
