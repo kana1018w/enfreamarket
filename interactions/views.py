@@ -132,6 +132,7 @@ def favorite_list(request):
 
     context = {
         'favorites': favorites,
+        'active_mypage_menu': 'favorites',
     }
     return render(request, 'interactions/favorite_list.html', context)
 
@@ -271,6 +272,7 @@ def sent_purchase_intents_list(request):
 
     context = {
         'sent_intents': sent_intents,
+        'active_mypage_menu': 'sent_intents',
     }
     return render(request, 'interactions/sent_purchase_intents_list.html', context)
 
@@ -319,6 +321,7 @@ def received_purchase_intents_list(request):
 
     context = {
         'received_intents': received_intents,
+        'active_mypage_menu': 'received_intents',
     }
     return render(request, 'interactions/received_purchase_intents_list.html', context)
 

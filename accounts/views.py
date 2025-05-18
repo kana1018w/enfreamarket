@@ -125,6 +125,7 @@ def mypage(request):
     # テンプレートに渡すデータ (コンテキスト) を作成
     context = {
         'user': user,
+        'active_mypage_menu': 'mypage',
     }
 
     return render(request, 'accounts/mypage.html', context)
@@ -153,15 +154,9 @@ def my_listings(request):
 
     context = {
         'products': user_products,
+        'active_mypage_menu': 'my_listings',
     }
     return render(request, 'accounts/my_listings.html', context)
-
-@login_required
-def my_intents_given(request):
-    return render(request, 'accounts/my_intents_given.html')
-@login_required
-def my_intents_received(request):
-    return render(request, 'accounts/my_intents_received.html')
 
 @login_required
 def profile_name_edit(request):
@@ -187,6 +182,7 @@ def profile_name_edit(request):
     # GETリクエスト、またはPOSTでバリデーション失敗した場合に実行
     context = {
         'form': form,
+        'active_mypage_menu': 'profile_name_edit',
     }
     # 名前変更用のテンプレートをレンダリング
     return render(request, 'accounts/name_edit.html', context)
@@ -213,6 +209,7 @@ def profile_display_name_edit(request):
 
     context = {
         'form': form,
+        'active_mypage_menu': 'profile_display_name_edit',
     }
 
     return render(request, 'accounts/display_name_edit.html', context)
@@ -234,6 +231,7 @@ def profile_email_edit(request):
 
     context = {
         'form': form,
+        'active_mypage_menu': 'profile_email_edit',
     }
 
     return render(request, 'accounts/email_edit.html', context)
@@ -245,6 +243,12 @@ class ProfilePasswordEditView(LoginRequiredMixin, PasswordChangeView): # ← ク
     form_class = CustomPasswordChangeForm
     template_name = 'accounts/password_edit.html'
     success_url = reverse_lazy('accounts:mypage')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 次に独自のコンテキスト変数を追加
+        context['active_mypage_menu'] = 'profile_password_edit'
+        return context
 
     # メソッドとして定義
     def form_valid(self, form):

@@ -18,7 +18,7 @@
 }
 
 /* アクティブメニュー */
-.custom-active {
+.list-group-item.custom-active {
     color: #4A8A85;  /* ミントより少し濃いグリーン系文字色 */
     font-weight: bold;
     border-bottom: 2px solid #A7DCD5;
