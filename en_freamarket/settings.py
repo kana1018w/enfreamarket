@@ -28,9 +28,9 @@ TEMPLATE_DIR = BASE_DIR / 'templates'
 SECRET_KEY = 'django-insecure-%=bw2cy)@mqv4$^(@^osv%t!kxd#)&q(1pnnhip6hnkmswu4%4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['kana1018.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition

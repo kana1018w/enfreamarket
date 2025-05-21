@@ -45,7 +45,7 @@ class ProductForm(forms.ModelForm):
         queryset=ProductCategory.objects.all().order_by('id'), # 有効なカテゴリすべてを選択肢に (名前順)
         widget=forms.RadioSelect,
         required=True,
-        initial=ProductCategory.objects.first(), # とりあえず最初のカテゴリを選択
+        initial=lambda: ProductCategory.objects.first(), # とりあえず最初のカテゴリを選択
         error_messages={'required': 'カテゴリを選択してください。'}
     )
 
