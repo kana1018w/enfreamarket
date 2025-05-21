@@ -125,41 +125,67 @@
                 </div>
                 <hr class="my-4">
 
-                {# --- 写真 (左:メイン, 右:サブ) --- #}
+                {# --- 画像 --- #}
+                <label class="form-label">画像{% if form.main_image.field.required%}<span class="text-danger">*</span>{% endif %}</label>
+                {# --- メイン --- #}
                 <div class="mb-3">
-                    <label class="form-label">写真{% if form.main_image.field.required or form.sub_images.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                    <div class="image-upload-container">
-                        {# --- メイン画像 --- #}
-                        <div class="mb-3">
-                            <label for="{{ form.main_image.id_for_label }}" style="font-size: 14px">{{ form.main_image.label }}{% if form.main_image.field.required %}<span class="text-danger">*</span>{% endif %}</label>
-                            <input type="file" name="{{ form.main_image.name }}" id="{{ form.main_image.id_for_label }}" class="form-control form-img-input ">
-                            {% if form.main_image.help_text %}
-                                <small class="form-text text-muted">{{ form.main_image.help_text }}</small>
-                            {% endif %}
-                            {% if form.main_image.errors %}
-                                <ul class="errorlist">
-                                    {% for error in form.main_image.errors %}
-                                    <li class="form-error">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
+                    <label class="form-label font-size: small">{{ form.main_image.label }}{% if form.main_image.field.required%}<span class="text-danger">*</span>{% endif %}</label>
+                    {{ form.main_image }}
+                    {% if form.main_image.help_text %}
+                        <small class="form-text text-muted">{{ form.main_image.help_text }}</small>
+                    {% endif %}
+                    {% if form.main_image.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.main_image.errors %}
+                            <li class="form-error">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
 
-                        {# --- サブ画像 --- #}
-                        <div class="mb-3">
-                            <label for="{{ form.sub_images.id_for_label }}" style="font-size: 14px">{{ form.sub_images.label }}</label>
-                            <input type="file" name="{{ form.sub_images.name }}" id="{{ form.sub_images.id_for_label }}" class="form-control form-img-input " multiple> {# 複数ファイル選択可能 #}
-                            {% if form.sub_images.help_text %}
-                                <small class="form-text text-muted">{{ form.sub_images.help_text }}</small>
-                            {% endif %}
-                            {% if form.sub_images.errors %}
-                                <ul class="errorlist">
-                                    {% for error in form.sub_images.errors %}
-                                    <li class="form-error">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
+                {# --- サブ --- #}
+                <label class="form-label font-size: small">サブ{% if form.sub_image_1.field.required%}<span class="text-danger">*</span>{% endif %}</label>
+                <div class="d-flex flex-wrap justify-content-start">
+                    {# サブ1 (この欄のみヘルプテキスト付き) #}
+                    <div class="mb-3 mr-3">
+                        <label for="{{ form.sub_image_1.id_for_label }}" style="font-size: small">{{ form.sub_image_1.label }}</label>
+                        {{ form.sub_image_1 }}
+                        {% if form.sub_image_1.help_text %}
+                            <small class="form-text text-muted">{{ form.sub_image_1.help_text }}</small>
+                        {% endif %}
+                        {% if form.sub_image_1.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.sub_image_1.errors %}
+                                <li class="form-error">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {# サブ2 #}
+                    <div class="mb-3 mr-3">
+                        <label for="{{ form.sub_image_2.id_for_label }}" style="font-size: small">{{ form.sub_image_2.label }}</label>
+                        {{ form.sub_image_2 }}
+                        {% if form.sub_image_2.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.sub_image_2.errors %}
+                                <li class="form-error">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {# サブ3 #}
+                    <div class="mb-3">
+                        <label for="{{ form.sub_image_3.id_for_label }}" style="font-size: small">{{ form.sub_image_3.label }}</label>
+                        {{ form.sub_image_3 }}
+                        {% if form.sub_image_3.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.sub_image_3.errors %}
+                                <li class="form-error">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
                 <hr class="my-4">

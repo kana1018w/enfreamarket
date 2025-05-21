@@ -164,16 +164,16 @@ def sell(request):
                     raise ValueError("メイン画像の保存に失敗しました。")
 
                 # 6. サブ画像を ProductImage として保存
-                sub_image_files = form.cleaned_data.get('sub_images')
-                if sub_image_files:
-                    for i, sub_image_file in enumerate(sub_image_files, start=1):
-                        # display_order を 1, 2, 3,... と設定
-                        if i <= 3: # 最大3枚まで formでチェック済みだが、念のため
-                            ProductImage.objects.create(
-                                product=product,
-                                image=sub_image_file,
-                                display_order=i
-                            )
+                sub_image_files_map = product.get_sub_images_as_dict()
+
+                for order, sub_image_file in sub_image_files_map.items():
+                    if sub_image_file:
+                        ProductImage.objects.create(
+                            product=product,
+                            image=sub_image_file,
+                            display_order=order # display_order を 1, 2, 3 と設定
+                        )
+
 
                 # 7. 成功メッセージを設定
                 messages.success(request, '商品を出品しました。')
@@ -291,6 +291,28 @@ def edit(request, pk):
                             display_order=0
                         )
                         updated_product.main_product_image = new_pi
+
+                    # サブ画像の更新処理
+                    existing_sub_images_map = product.get_sub_images_as_dict()
+                    for i in range(1, 4): # 1, 2, 3
+                        new_sub_image_file = form.cleaned_data.get(f'sub_image_{i}') # フォームから新しい画像ファイルを取得 (1, 2, 3)
+                        current_sub_image_instance = existing_sub_images_map.get(i)
+
+                        if new_sub_image_file: # 新しい画像がアップロードされた場合
+                            if current_sub_image_instance:
+                                # 既存のサブ画像を削除
+                                current_sub_image_instance.image.delete(save=False)
+                                # 既存のサブ画像を更新
+                                current_sub_image_instance.image = new_sub_image_file
+                                current_sub_image_instance.save()
+                            else:
+                                # 新しいサブ画像を作成
+                                ProductImage.objects.create(
+                                    product=updated_product, # この時点ではまだ updated_product は保存されていないが、後で保存される
+                                    image=new_sub_image_file,
+                                    display_order=i
+                                )    
+
                     # 全ての変更をDBに保存
                     updated_product.save()
 
@@ -303,7 +325,8 @@ def edit(request, pk):
                 # エラー発生時もフォームを再表示 (編集中のデータを保持)
                 context = {
                     'form': form,
-                    'product': product # テンプレートで商品情報を参照する場合に備えて渡す
+                    'product': product, # テンプレートで商品情報を参照する場合に備えて渡す
+                    'sub_images_map': product.get_sub_images_as_dict(),
                 }
                 return render(request, 'products/edit.html', context)
 
@@ -313,7 +336,8 @@ def edit(request, pk):
             # エラーメッセージ付きのフォームを再表示
             context = {
                 'form': form,
-                'product': product
+                'product': product,
+                'sub_images_map': product.get_sub_images_as_dict(),
             }
             return render(request, 'products/edit.html', context)
 
@@ -323,7 +347,8 @@ def edit(request, pk):
 
     context = {
         'form': form,
-        'product': product
+        'product': product,
+        'sub_images_map': product.get_sub_images_as_dict(),
     }
     return render(request, 'products/edit.html', context)
 

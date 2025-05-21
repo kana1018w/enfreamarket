@@ -4,7 +4,7 @@ from django import forms
 from .models import Product, ProductCategory, ProductImage
 
 class ProductForm(forms.ModelForm):
-    """商品出品フォーム (メイン/サブ画像分離)"""
+    """商品出品フォーム"""
 
     # --- 商品名フィールド ---
     name = forms.CharField(
@@ -85,25 +85,32 @@ class ProductForm(forms.ModelForm):
 
     # --- メイン画像フィールド ---
     main_image = forms.ImageField(
-        label='メイン画像',
+        label='メイン',
         required=False, # 編集画面の実装の関係で一旦False, init method で商品登録時はTrue に変更
-        error_messages={'required': 'メイン画像を登録してください。'},
-        widget=forms.FileInput(attrs={'class': 'form-control main-image'}),
-        help_text='メイン画像の登録は必須です。' # clean_sub_images で枚数制限 
+        error_messages={'required': 'メイン写真を登録してください。'},
+        widget=forms.FileInput(attrs={'class': 'form-control form-img-input main-image'}),
     )
 
-    # --- サブ画像フィールド ---
-    sub_images = forms.ImageField(
-        label='サブ画像',
+    # --- サブ画像フィールド (1枚ずつ, 3枚まで) ---
+    sub_image_1 = forms.ImageField(
+        label='1枚目',
+        required=False, # 任意
+        widget=forms.FileInput(attrs={'class': 'form-control form-img-input sub-image'}),
+        help_text='サブ画像の登録は任意です。最大3枚まで登録可能です。'
+    )
+    sub_image_2 = forms.ImageField(
+        label='2枚目',
         required=False,
-        widget=forms.FileInput(
-            attrs={
-                'class': 'form-control sub-images' # 必要に応じてクラス追加
-            }
-        ),
-        help_text='サブ画像の登録は任意です。最大3枚までアップロードできます。' # clean_sub_images で枚数制限
+        widget=forms.FileInput(attrs={'class': 'form-control form-img-input sub-image'}),
+    )
+    sub_image_3 = forms.ImageField(
+        label='3枚目',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control form-img-input sub-image'}),
     )
 
+    # 編集時の写真更新に関する共通ヘルプテキスト
+    image_update_help_text ='現在の写真を変更する場合は、新しい写真をアップロードしてください。空のまま送信すると現在の写真が維持されます。'
 
     class Meta:
         model = Product
@@ -126,24 +133,13 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs) # 親クラスの初期化
 
         # is_edit フラグに基づいて main_image の設定を変更
-        # 一旦 編集では写真の編集機能を実装しないので、main_image を非必須にする
         if is_edit:
             self.fields['main_image'].required = False
-            self.fields['main_image'].help_text = '現在のメイン画像を変更する場合は、新しい画像をアップロードしてください。空のまま送信すると現在の画像が維持されます。'
         else:
             # 新規出品時
             self.fields['main_image'].required = True
             self.fields['main_image'].error_messages = {'required': 'メイン画像を登録してください。'}
             self.fields['main_image'].help_text = 'メイン画像の登録は必須です。'
-
-    # --- サブ画像の枚数チェック (前回と同様) ---
-    def clean_sub_images(self):
-        """サブ画像の枚数をバリデーション (最大3枚)"""
-        sub_images = self.files.getlist('sub_images')
-        MAX_SUB_IMAGES = 3
-        if len(sub_images) > MAX_SUB_IMAGES:
-            raise forms.ValidationError(f'サブ画像は最大 {MAX_SUB_IMAGES} 枚までアップロードできます。アップロードされたファイル数: {len(sub_images)}')
-        return sub_images
 
     # --- 全体に関わるバリデーション は特にないのでcleanメソッドは定義しない ---
 
