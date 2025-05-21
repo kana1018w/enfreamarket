@@ -21,16 +21,31 @@ select.login-input {
 }
 
 /* 商品画像 */
-.image-upload-container {
-  display: flex;
-  gap: 40px;
-  align-items: flex-start;
-}
-
 .form-img-input{
+  font-size: 12px;
   height: auto;
   border-radius: .25rem;
-  width: 100%;
+  width: auto;
+}
+
+
+/* 画像編集 */
+.image-upload-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.image-upload-row img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover; /* アスペクト比を保ちつつコンテナを埋める */
+  margin-right: 1rem;
+  border: 1px solid #ddd;
+}
+
+.image-upload-row .form-input {
+  flex: 1; /* 残りの幅をコンテンツエリアが取る */
 }
 
 .btn-primary-action {

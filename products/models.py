@@ -167,4 +167,28 @@ class Product(models.Model):
     def __str__(self):
         return f'{self.name} (¥{self.price}) {self.size} / {self.product_category} / {self.condition}'
 
+    def get_sub_image_by_display_order(self, order):
+        """指定された display_order のサブ画像 (メイン画像以外) を取得する。なければ None を返す。"""
+        try:
+            # メイン画像は display_order=0 と仮定
+            if order == 0: # display_order=0 はメイン画像なので除外
+                return None
+            return self.images.get(display_order=order)
+        except ProductImage.DoesNotExist:
+            return None
+
+    def get_sub_images_as_dict(self):
+        """サブ画像を display_order をキーとした辞書として取得する (1, 2, 3)"""
+        sub_images_dict = {}
+        # メイン画像を除外し、display_order が 1, 2, 3 のものを対象とする
+        images = self.images.filter(display_order__in=[1, 2, 3]).order_by('display_order')
+        for img in images:
+            sub_images_dict[img.display_order] = img
+        
+        # 存在しない display_order のキーも None で埋めておく (テンプレートでの扱いを容易にするため)
+        for i in range(1, 4): # 1, 2, 3
+            if i not in sub_images_dict:
+                sub_images_dict[i] = None
+        return sub_images_dict
+
 
