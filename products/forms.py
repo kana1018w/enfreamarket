@@ -157,7 +157,7 @@ class ProductSearchForm(forms.Form):
     # 複数選択可能なチェックボックスとして表示
     category = forms.ModelMultipleChoiceField(
         label='カテゴリ',
-        queryset=ProductCategory.objects.all().order_by('name'),
+        queryset=ProductCategory.objects.all().order_by('id'),
         widget=forms.CheckboxSelectMultiple,
         required=False, # 絞り込みなので必須ではない
     )

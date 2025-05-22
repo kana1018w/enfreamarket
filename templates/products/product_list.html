@@ -163,11 +163,11 @@
                                             {# 商品名 #}
                                             <h6 class="mb-1">
                                                 <a href="{% url 'products:product_detail' pk=product.pk %}" class="text-decoration-none text-dark">
-                                                    {{ product.name }}
+                                                    {{ product.name|truncatechars:20 }}
                                                 </a>
                                             </h6>
                                         </div>
-                                        <div class="product-description small mt-2 "> {{ product.description }} </div>
+                                        <div class="product-description small mt-2 "> {{ product.description|linebreaksbr }} </div>
                                     </div>
                                     <div class="col-md-5 col-12">
                                         <div class="d-flex justify-content-md-end align-items-center item-status-menu">
