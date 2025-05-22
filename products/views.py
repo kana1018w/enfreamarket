@@ -164,15 +164,29 @@ def sell(request):
                     raise ValueError("メイン画像の保存に失敗しました。")
 
                 # 6. サブ画像を ProductImage として保存
-                sub_image_files_map = product.get_sub_images_as_dict()
+                uploaded_sub_image_1 = form.cleaned_data.get('sub_image_1')
+                if uploaded_sub_image_1:
+                    ProductImage.objects.create(
+                        product=product,
+                        image=uploaded_sub_image_1,
+                        display_order=1
+                    )
 
-                for order, sub_image_file in sub_image_files_map.items():
-                    if sub_image_file:
-                        ProductImage.objects.create(
-                            product=product,
-                            image=sub_image_file,
-                            display_order=order # display_order を 1, 2, 3 と設定
-                        )
+                uploaded_sub_image_2 = form.cleaned_data.get('sub_image_2')
+                if uploaded_sub_image_2:
+                    ProductImage.objects.create(
+                        product=product,
+                        image=uploaded_sub_image_2,
+                        display_order=2
+                    )
+
+                uploaded_sub_image_3 = form.cleaned_data.get('sub_image_3')
+                if uploaded_sub_image_3:
+                    ProductImage.objects.create(
+                        product=product,
+                        image=uploaded_sub_image_3,
+                        display_order=3
+                    )
 
 
                 # 7. 成功メッセージを設定
