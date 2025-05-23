@@ -13,9 +13,16 @@ from interactions.forms import CommentForm
 @login_required
 def product_list_view(request):
     """トップページ (商品一覧) ビュー"""
-
     # 1. 商品データの取得とフィルタリング
-    queryset = Product.objects.filter(status=Product.Status.FOR_SALE)
+    # ログインユーザーの所属園を取得
+    user_kindergarten = None
+    if request.user.is_authenticated and hasattr(request.user, 'kindergarten') and request.user.kindergarten:
+        user_kindergarten = request.user.kindergarten
+    else:
+        messages.error(request, "所属園の情報が取得できませんでした。ログインし直してください。")
+        return redirect('accounts:login')
+
+    queryset = Product.objects.filter(status=Product.Status.FOR_SALE, kindergarten=user_kindergarten)
 
     if request.user.is_authenticated:
         queryset = queryset.exclude(user=request.user) # 自分が出品したものを除外
