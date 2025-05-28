@@ -9,6 +9,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from interactions.models import Comment, Favorite, PurchaseIntent
 from interactions.forms import CommentForm
+from django.urls import reverse
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.core.mail import send_mail
 
 @login_required
 def product_list_view(request):
@@ -258,7 +262,53 @@ def detail(request, pk):
 
     # 関連するコメントを取得
     comments = product.comments.all().order_by('created_at') # 関連するコメントを取得し、古い順に並べる
-    comment_form = CommentForm()
+ 
+    # コメントフォーム処理
+    if request.method == 'POST':
+        # コメント投稿処理
+        comment_form_data = CommentForm(request.POST)
+        if comment_form_data.is_valid():
+            comment = comment_form_data.save(commit=False)
+            comment.product = product
+            comment.user = request.user
+            comment.save()
+            messages.success(request, 'コメントを投稿しました。')
+
+            # メール通知処理
+            if product.user != request.user:
+                try:
+                    subject = f'【園フリマ】「{product.name}」に新しいコメントがありました'
+                    mail_context = {
+                        'product_owner_display_name': product.user.display_name or product.user.get_username(),
+                        'product_name': product.name,
+                        'commenter_display_name': request.user.display_name or request.user.get_username(),
+                        'comment_text': comment.content,
+                        'product_detail_url': request.build_absolute_uri(
+                            reverse('products:product_detail', kwargs={'pk': product.pk})
+                        ),
+                    }
+                    message_body = render_to_string('emails/new_comment_notification_email.txt', mail_context)
+                    recipient_list = [product.user.email]
+
+                    send_mail(
+                        subject,
+                        message_body,
+                        settings.DEFAULT_FROM_EMAIL,
+                        recipient_list,
+                        fail_silently=False
+                    )
+                    print(f"New comment notification mail sent to {product.user.email} for product {product.name}")
+                except Exception as e:
+                    print(f"Error sending new comment notification email: {e}")
+                    messages.warning(request, "コメントは投稿しましたが、出品者への通知メールの送信に失敗しました。")
+
+            return redirect('products:product_detail', pk=product.pk) # 成功時はリダイレクト
+        else:
+            # エラーメッセージを表示
+            comment_form = comment_form_data
+    else:
+        # GETリクエストの場合、空のフォームを準備
+        comment_form = CommentForm()
 
     context = {
         'product': product,
