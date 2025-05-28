@@ -5,6 +5,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
 <link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
 
 {% block page_title %}
@@ -155,7 +156,7 @@
             {% else %}
                 <div class="comment-form-wrapper">
                     {% if request.user.is_authenticated %}
-                        <form method="POST" action="{% url 'interactions:add_comment' product_pk=product.pk %}">
+                        <form method="POST" action="{% url 'products:product_detail' pk=product.pk %}" novalidate>
                             {% csrf_token %}
                             <div class="mb-2">
                                 <p class="font-weight-bold mb-1">商品へのコメント</p>
@@ -163,9 +164,13 @@
                                 {% if comment_form.content.help_text %}
                                     <small class="form-text text-muted">{{ comment_form.content.help_text }}</small>
                                 {% endif %}
-                                {% for error in comment_form.content.errors %}
-                                    <li class="form-error">{{ error }}</li>
-                                {% endfor %}
+                                {% if comment_form.content.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in comment_form.content.errors %}
+                                        <li class="form-error">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </div>
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn btn-secondary-action btn-sm mt-2">コメント送信</button>
