@@ -14,56 +14,6 @@ from django.core.mail import send_mail
 
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
-def add_comment(request, product_pk):
-    """商品にコメントを投稿する"""
-    product = get_object_or_404(Product, pk=product_pk) # コメント対象の商品を取得
-    form = CommentForm(request.POST)
-
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.product = product         # コメントと商品を紐付ける
-        comment.user = request.user       # コメントとユーザーを紐付ける
-        comment.save()
-        messages.success(request, 'コメントを投稿しました。')
-
-        if product.user != request.user: # 出品者とコメント投稿者が異なる場合のみ通知
-            try:
-                subject = f'【園フリマ】「{product.name}」に新しいコメントがありました'
-                mail_context = {
-                    'product_owner_display_name': product.user.display_name or product.user.get_username(),
-                    'product_name': product.name,
-                    'commenter_display_name': request.user.display_name or request.user.get_username(),
-                    'comment_text': comment.content,
-                    'product_detail_url': request.build_absolute_uri(
-                        reverse('products:product_detail', kwargs={'pk': product.pk})
-                    ),
-                }
-                message_body = render_to_string('emails/new_comment_notification_email.txt', mail_context)
-                recipient_list = [product.user.email] # 出品者のメールアドレス
-
-                send_mail(
-                    subject,
-                    message_body,
-                    settings.DEFAULT_FROM_EMAIL,
-                    recipient_list,
-                    fail_silently=False
-                )
-                print(f"New comment notification mail sent to {product.user.email} for product {product.name}") # 開発用
-            except Exception as e:
-                print(f"Error sending new comment notification email: {e}")
-                messages.warning(request, "コメントは投稿しましたが、出品者への通知メールの送信に失敗しました。")
-    else:
-        # コメント投稿は任意なのでエラーは発生しない
-        # バリデーション追加した場合はここを修正
-        for error_list in form.errors.values():
-            for error in error_list:
-                messages.error(request, error)
-        # messages.error(request, 'コメントの投稿に失敗しました。入力内容を確認してください。')
-
-    return redirect('products:product_detail', pk=product_pk)
-
-@login_required
-@require_POST # POSTリクエストのみを受け付ける
 def favorite_toggle(request, product_pk):
     """お気に入り登録/解除"""
     product = get_object_or_404(Product, pk=product_pk)

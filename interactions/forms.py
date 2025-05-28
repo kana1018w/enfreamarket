@@ -7,10 +7,11 @@ class CommentForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control', 'rows': '3',
-                'placeholder': 'コメントを入力（任意）'
+                'placeholder': 'コメントを入力してください'
             }
         ),
-        required=False
+        required=True,
+        error_messages={'required': '未入力の場合、コメントは送信できません。'}
     )
 
     class Meta:
