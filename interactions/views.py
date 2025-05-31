@@ -139,14 +139,20 @@ def add_purchase_intent(request, product_pk):
 
             logger.info(
                 f"Successfully sent purchase intent notification email. "
-                f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                f"Recipient: {product.user.email} / (user: {product.user.username})"
+                f"Product: {product.name} (ID: {product.pk}), "
+                f"Send to: {product.user.email},"
+                # 出品者情報
+                f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                # 意思表示者情報
+                f"Intent by: {request.user.display_name} ({request.user.email}), "
             )
         except Exception as e:
             logger.error(
                 f"[[MAIL ERROR]] Failed to send purchase intent notification email. "
-                f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                f"Recipient: {product.user.email} / (user: {product.user.username})"
+                f"Product: {product.name} (ID: {product.pk}), "
+                f"Send to: {product.user.email},"
+                f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                f"Intent by: {request.user.display_name}) ({request.user.email}), "
                 f"Error: {e}",
                 exc_info=True # スタックトレースをログに出力
             )
@@ -338,15 +344,21 @@ def start_transaction(request, intent_pk):
                 )
 
                 logger.info(
-                    f"Successfully transaction started email. "
-                    f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                    f"Recipient: {buyer.email} / (user: {buyer.username})"
+                    f"Successfully sent purchase intent notification email. "
+                    f"Product: {product.name} (ID: {product.pk}), "
+                    f"Send to: {buyer.email},"
+                    # 出品者情報
+                    f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                    # 取引者情報
+                    f"Negotiating User: {buyer.display_name} ({buyer.email}), "
                 )
             except Exception as e:
                 logger.error(
                     f"[[MAIL ERROR]] Failed to send transaction started email. "
-                    f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                    f"Recipient: {buyer.email} / (user: {buyer.username})",
+                    f"Product: {product.name} (ID: {product.pk}), "
+                    f"Send to: {buyer.email},"
+                    f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                    f"Negotiating User: {buyer.display_name} ({buyer.email}), "
                     f"Error: {e}",
                     exc_info=True
                 )

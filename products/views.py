@@ -302,15 +302,23 @@ def detail(request, pk):
                     )
                     logger.info(
                         f"Successfully new comment notification email. "
-                        f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                        f"Recipient: {product.user.email} / (user: {product.user.username})"
+                        f"Product: {product.name} (ID: {product.pk}), "
+                        f"Send to: {product.user.email},"
+                        f"Comment: {comment.content},"
+                        # 出品者情報
+                        f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                        # コメント者情報
+                        f"Commenter: {request.user.display_name} ({request.user.email}), "
                     )
                 except Exception as e:
                     print(f"Error sending new comment notification email: {e}")
                     logger.error(
                         f"[[MAIL ERROR]] Failed to send new comment notification email. "
-                        f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
-                        f"Recipient: {product.user.email} / (user: {product.user.username})",
+                        f"Product: {product.name} (ID: {product.pk}), "
+                        f"Send to: {product.user.email}"
+                        f"Comment: {comment.content},"
+                        f"Product Owner: {product.user.display_name} ({product.user.email}), "
+                        f"Commenter: {request.user.display_name} ({request.user.email}), "
                         f"Error: {e}",
                         exc_info=True
                     )
