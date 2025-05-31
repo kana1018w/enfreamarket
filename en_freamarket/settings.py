@@ -157,3 +157,41 @@ EMAIL_FILE_PATH = BASE_DIR / 'emails'
 DEFAULT_FROM_EMAIL = f'"園フリマ運営" <{EMAIL_HOST_USER}>'
 
 LOGIN_URL = 'accounts:login'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'development': {
+            'format': '%(asctime)s [%(levelname)s] %(message)s' # ログ日時　　, ログレベル, ログ内容 
+        },
+    },
+    # ログ出力先
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'development',
+        },
+        'file': {
+            'level': 'ERROR', # ERROR以上のログを出力
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'when': 'midnight',
+            'backupCount': 21, # 21日分保存
+            'formatter': 'development',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO', # INFO以上のログを出力
+            'propagate': True,
+        }
+    },
+}
+
+# 'logs' ディレクトリがなければ作成
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)

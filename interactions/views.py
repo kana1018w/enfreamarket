@@ -12,6 +12,9 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.core.mail import send_mail
 
+import logging
+logger = logging.getLogger(__name__)
+
 @login_required
 @require_POST # POSTリクエストのみを受け付ける
 def favorite_toggle(request, product_pk):
@@ -133,10 +136,20 @@ def add_purchase_intent(request, product_pk):
                 recipient_list,
                 fail_silently=False # 送信失敗時にエラーを発生させる (開発中はTrueでも良い)
             )
-            print(f"Mail sent to {product.user.email} for product {product.name}")
+
+            logger.info(
+                f"Successfully sent purchase intent notification email. "
+                f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                f"Recipient: {product.user.email} / (user: {product.user.username})"
+            )
         except Exception as e:
-            # メール送信失敗時のエラーハンドリング (ログ記録など)
-            print(f"Error sending email for purchase intent: {e}")
+            logger.error(
+                f"[[MAIL ERROR]] Failed to send purchase intent notification email. "
+                f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                f"Recipient: {product.user.email} / (user: {product.user.username})"
+                f"Error: {e}",
+                exc_info=True # スタックトレースをログに出力
+            )
             messages.warning(request, "購入意思は伝えましたが、出品者への通知メールの送信に失敗しました。")
 
     else:
@@ -323,17 +336,27 @@ def start_transaction(request, intent_pk):
                     recipient_list,
                     fail_silently=False
                 )
-                print(f"Transaction started mail sent to {buyer.email} for product {product.name}") # 開発用
+
+                logger.info(
+                    f"Successfully transaction started email. "
+                    f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                    f"Recipient: {buyer.email} / (user: {buyer.username})"
+                )
             except Exception as e:
-                print(f"Error sending transaction started email: {e}")
+                logger.error(
+                    f"[[MAIL ERROR]] Failed to send transaction started email. "
+                    f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                    f"Recipient: {buyer.email} / (user: {buyer.username})",
+                    f"Error: {e}",
+                    exc_info=True
+                )
                 messages.warning(request, "取引は開始しましたが、購入者への通知メールの送信に失敗しました。")
 
             messages.success(request, f"「{product.name}」について、{buyer.display_name}さんとの取引を開始しました。")
 
     except Exception as e:
         messages.error(request, f"取引開始処理中にエラーが発生しました: {e}")
-        # エラーログなども記録すると良い
-        print(f"Error during start_transaction: {e}")
+        logger.error(f"Error during start_transaction: {e}", exc_info=True)
 
     return redirect('interactions:received_purchase_intents_list')
 
