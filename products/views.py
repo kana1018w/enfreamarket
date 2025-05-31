@@ -14,6 +14,9 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.core.mail import send_mail
 
+import logging
+logger = logging.getLogger(__name__)
+
 @login_required
 def product_list_view(request):
     """トップページ (商品一覧) ビュー"""
@@ -297,9 +300,20 @@ def detail(request, pk):
                         recipient_list,
                         fail_silently=False
                     )
-                    print(f"New comment notification mail sent to {product.user.email} for product {product.name}")
+                    logger.info(
+                        f"Successfully new comment notification email. "
+                        f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                        f"Recipient: {product.user.email} / (user: {product.user.username})"
+                    )
                 except Exception as e:
                     print(f"Error sending new comment notification email: {e}")
+                    logger.error(
+                        f"[[MAIL ERROR]] Failed to send new comment notification email. "
+                        f"Product: {product.name} / (ID: {product.pk}) / (user: {product.user.username})"
+                        f"Recipient: {product.user.email} / (user: {product.user.username})",
+                        f"Error: {e}",
+                        exc_info=True
+                    )
                     messages.warning(request, "コメントは投稿しましたが、出品者への通知メールの送信に失敗しました。")
 
             return redirect('products:product_detail', pk=product.pk) # 成功時はリダイレクト
