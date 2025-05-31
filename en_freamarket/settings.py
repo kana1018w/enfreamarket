@@ -174,7 +174,7 @@ LOGGING = {
             'formatter': 'development',
         },
         'file': {
-            'level': 'INFO', # ERROR以上のログを出力
+            'level': 'ERROR', # ERROR以上のログを出力
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
             'when': 'midnight',
