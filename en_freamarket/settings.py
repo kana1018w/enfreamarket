@@ -183,9 +183,14 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        '': {
             'handlers': ['file', 'console'],
             'level': 'INFO', # INFO以上のログを出力
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
             'propagate': True,
         }
     },
