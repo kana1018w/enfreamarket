@@ -63,11 +63,11 @@
                                                 {# 取引完了ボタン #}
                                                 <form method="POST" action="{% url 'interactions:complete_transaction' intent_pk=intent.pk %}" class="d-inline">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-secondary-action">取引を完了する</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger-action">取引を完了する</button>
                                                 </form>
                                             {% else %}
                                                 {# 表示調整のため設置 #}
-                                                <button type="button" class="btn btn-sm btn-secondary-action" style="visibility: hidden;">取引を完了する</button>
+                                                <button type="button" class="btn btn-sm btn-danger-action" style="visibility: hidden;">取引を完了する</button>
                                             {% endif %}
                                         </div>
                                     </div>
