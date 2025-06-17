@@ -181,3 +181,55 @@ a.link-subtle:hover {
     }
 }
 
+@media (max-width: 767.98px) {
+    .card-header h4 { /* スマホの時はタイトルを小さく */
+        font-size: 1rem;
+    }
+}
+
+
+/* --- SP Navigation --- */
+.sp-nav .nav-item {
+    margin-left: 10px; /* アイコン間の余白 */
+}
+.sp-nav .nav-item:first-child {
+    margin-left: 0;
+}
+.sp-nav .nav-link {
+    padding: 0.5rem 0.5rem; /* アイコンのクリック領域を確保 */
+    color: #333; /* アイコンの色 (適宜変更) */
+}
+.sp-nav .nav-link:hover {
+    color: #007bff; /* ホバー時の色 (適宜変更) */
+}
+.sp-nav .fa-lg { /* Font Awesomeのアイコンサイズ調整 */
+    font-size: 1.25em; /* 少し大きめに */
+    vertical-align: middle;
+}
+#hamburger-icon-sp {
+    border: none; /* buttonのデフォルトスタイルを消す */
+    background: none;
+}
+
+
+/* --- SP Menu Content (ハンバーガーメニュー展開時) --- */
+.sp-menu-content {
+    background-color: #f8f9fa; /* メニューの背景色 (適宜変更) */
+    border-top: 1px solid #dee2e6;
+    position: absolute; /* ヘッダーの下に絶対配置 */
+    top: 100%; /* ヘッダーの高さ分下に配置 */
+    left: 0;
+    right: 0;
+    z-index: 1020; /* ヘッダーよりは下、メインコンテンツよりは上 */
+}
+.sp-menu-content .nav-link {
+    padding: 10px 15px;
+    color: #333;
+    border-bottom: 1px solid #eee; /* 各メニュー項目の区切り線 */
+}
+.sp-menu-content .nav-link:hover {
+    background-color: #e9ecef;
+}
+.sp-menu-content .nav-item:last-child .nav-link {
+    border-bottom: none;
+}

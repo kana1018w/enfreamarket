@@ -143,7 +143,7 @@
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             {# --- 商品画像 --- #}
-                            <div class="col-md-2 col-3">
+                            <div class="col-md-2 col-12 mb-2 text-center">
                                 <a href="{% url 'products:product_detail' pk=product.pk %}">
                                     {% if product.main_product_image %}
                                         <img src="{{ product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
@@ -156,7 +156,7 @@
                                 </a>
                             </div>
 
-                            <div class="col-md-10 col-9" >
+                            <div class="col-md-10 col-12" >
                                 <div class="row align-items-center">
                                     <div class="col-md-7 col-12">
                                         <div class="product-title">

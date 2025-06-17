@@ -16,7 +16,9 @@
 {% block body_content %}
 <div class="mypage-container">
     {# --- 左側メニューエリア --- #}
-    {% include 'mypage_menu.html' %}
+    <div class="mypage-menu-area d-none d-md-block">
+        {% include 'mypage_menu.html' %}
+    </div>
 
     {# --- 右側情報エリア --- #}
     <div class="mypage-info">
