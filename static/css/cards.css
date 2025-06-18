@@ -2,7 +2,7 @@
 .card-wrapper {
     max-width: 1280px;
     margin: 30px auto;
-  }
+}
   
 .card {
     background-color: rgba(255, 255, 255, 0.9); /* ← 半透明にして背景を見せる */
@@ -39,4 +39,10 @@
 .card-content {
     font-size: 1rem;
     line-height: 1.6;
+}
+
+@media (max-width: 767.98px) {
+    .card-wrapper {
+        padding-top: 30px;
+    }
 }
