@@ -7,7 +7,69 @@
         <img src="{% static 'img/header_logo.png' %}" alt="園フリマロゴ" class="header-logo">
       </a>
     </div>
-    <nav class="navbar navbar-expand">
+
+    {# --- スマホ表示用ナビゲーション (最初は非表示、特定のブレークポイントで表示) --- #}
+    <nav class="sp-nav d-lg-none"> {# d-lg-none: lgサイズ以上で非表示 #}
+      <ul class="navbar-nav d-flex flex-row align-items-center">
+        {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'products:sell' %}" title="出品">
+                    <i class="far fa-plus-square fa-lg text-muted"></i> {# 出品アイコン #}
+                </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="logout-icon-sp" title="ログアウト"
+                 onclick="event.preventDefault(); document.getElementById('logout-form-sp').submit();">
+                  <i class="fas fa-sign-out-alt fa-lg text-muted"></i> {# ログアウトアイコン #}
+              </a>
+              <form id="logout-form-sp" method="post" action="{% url 'accounts:logout' %}" style="display: none;">
+                  {% csrf_token %}
+              </form>
+          </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'accounts:login' %}" title="ログイン">
+                    <i class="fas fa-sign-in-alt fa-lg text-muted"></i> {# ログインアイコン #}
+                </a>
+            </li>
+        {% endif %}
+        <li class="nav-item">
+            <button class="nav-link btn btn-link" type="button" id="hamburger-icon-sp" title="メニュー"
+                    data-toggle="collapse" data-target="#spMenu" aria-controls="spMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars fa-lg text-muted"></i> {# ハンバーガーメニューアイコン #}
+            </button>
+        </li>
+      </ul>
+    </nav>
+
+    {# --- スマホ用ドロップダウンメニュー (ハンバーガーメニュークリックで表示) --- #}
+    <div class="collapse navbar-collapse sp-menu-content" id="spMenu">
+        <ul class="navbar-nav flex-column p-3">
+            {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:mypage' %}">マイページ</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'interactions:favorite_list' %}">お気に入り</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'products:sell' %}">出品する</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:my_listings' %}">出品した商品</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'interactions:sent_purchase_intents_list' %}">購入意思を示した商品</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'interactions:received_purchase_intents_list' %}">購入意思を受けた商品</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile_name_edit' %}">名前の変更</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile_display_name_edit' %}">表示名の変更</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile_email_edit' %}">メールアドレスの変更</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile_password_edit' %}">パスワードの変更</a></li>
+                <li class="nav-item">
+                    <form id="logout-form-menu" method="post" action="{% url 'accounts:logout' %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">ログイン</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'accounts:signup' %}">新規登録</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+
+    <nav class="navbar navbar-expand d-none d-lg-block">
       <ul class="navbar-nav d-flex flex-row align-items-center">
         {% if user.is_authenticated %}
           {# --- マイページ (ドロップダウンメニュー) --- #}

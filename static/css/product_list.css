@@ -67,3 +67,20 @@
     background-color: #6c879e;
     color: #fff;
 }
+
+
+/* スマホ用の縦並び */
+@media (max-width: 767.98px) {
+    .product-list-container {
+      display: block;  /* グリッド解除で縦並びに */
+    }
+  
+    .search-sidebar {
+      display: block !important;  /* スマホでも表示 */
+      margin-bottom: 2rem;
+    }
+  
+    .product-list-items {
+      width: 100%;
+    }
+}

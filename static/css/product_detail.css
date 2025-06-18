@@ -162,3 +162,24 @@
     font-size: 0.8em;
     color: #777;
 }
+
+
+@media (max-width: 767.98px) {
+    .product-detail-grid {
+      grid-template-columns: 1fr; /* スマホでは縦1列に */
+    }
+
+    .product-images-section {
+      order: 1;
+    }
+
+    .product-info-section {
+      order: 2;
+    }
+
+    .main-image-wrapper img,
+    .sub-image-box img {
+      width: 100%;
+      height: auto;
+    }
+}

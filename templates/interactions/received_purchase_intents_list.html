@@ -19,7 +19,9 @@
 {% block body_content %}
 <div class="mypage-container">
     {# --- 左側メニューエリア --- #}
-    {% include 'mypage_menu.html' %}
+    <div class="mypage-menu-area d-none d-md-block">
+        {% include 'mypage_menu.html' %}
+    </div>
 
     {# --- 右側コンテンツエリア --- #}
     <div class="mypage-info">
@@ -28,7 +30,7 @@
                 {% for intent in received_intents %}
                     <div class="list-group-item received-intent-item">
                         <div class="row align-items-center">
-                            <div class="col-md-2 col-3">
+                            <div class="col-md-2 col-12 mb-2 text-center">
                                 <a href="{% url 'products:product_detail' pk=intent.product.pk %}">
                                     {% if intent.product.main_product_image %}
                                         <img src="{{ intent.product.main_product_image.image.url }}" class="img-fluid" alt="{{ intent.product.name }}">
@@ -37,7 +39,7 @@
                                     {% endif %}
                                 </a>
                             </div>
-                            <div class="col-md-10 col-9" >
+                            <div class="col-md-10 col-12">
                                 <div class="row align-items-center">
                                     <div class="col-md-6 col-12">
                                         <h6 class="mb-1">
@@ -48,7 +50,7 @@
                                         <div class="product-description small mt-2 "> {{ intent.product.description|linebreaksbr }} </div>
                                     </div>
                                     <div class="col-md-6 col-12">
-                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                        <div class="d-flex justify-content-end align-items-center item-status-menu">
                                             {# 価格, ステータス #}
                                             <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
                                             <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.get_status_display }}</span>

@@ -19,7 +19,9 @@
 {% block body_content %}
 <div class="mypage-container">
     {# --- 左側メニューエリア --- #}
-    {% include 'mypage_menu.html' %}
+    <div class="mypage-menu-area d-none d-md-block">
+        {% include 'mypage_menu.html' %}
+    </div>
 
     {# --- 右側フォームエリア --- #}
     <div class="mypage-info">
@@ -29,7 +31,7 @@
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             {# --- 商品画像 --- #}
-                            <div class="col-md-2 col-3">
+                            <div class="col-md-2 col-12 mb-2 text-center">
                                 <a href="{% url 'products:product_detail' pk=product.pk %}">
                                     {% if product.main_product_image %}
                                         <img src="{{ product.main_product_image.image.url }}" class="img-fluid" alt="{{ product.name }}">
@@ -42,7 +44,7 @@
                                 </a>
                             </div>
     
-                            <div class="col-md-10 col-9" >
+                            <div class="col-md-10 col-12" >
                                 <div class="row align-items-center">
                                     {# --- 商品情報 --- #}
                                     <div class="col-md-6 col-12">
@@ -59,7 +61,7 @@
     
                                     {# --- その他情報 --- #}
                                     <div class="col-md-6 col-12">
-                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                        <div class="d-flex justify-content-end align-items-center item-status-menu">
                                             {# 価格 #}
                                             <span class="text-muted">¥{{ product.price|intcomma }}</span>
                                             {# ステータス #}
