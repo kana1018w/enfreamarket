@@ -181,12 +181,6 @@ a.link-subtle:hover {
     }
 }
 
-@media (max-width: 767.98px) {
-    .card-header h4 { /* スマホの時はタイトルを小さく */
-        font-size: 1rem;
-    }
-}
-
 
 /* --- SP Navigation --- */
 .sp-nav .nav-item {

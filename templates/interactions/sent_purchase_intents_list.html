@@ -50,7 +50,7 @@
                                         <div class="product-description small mt-2 "> {{ intent.product.description|linebreaksbr }} </div>
                                     </div>
                                     <div class="col-md-6 col-12">
-                                        <div class="d-flex justify-content-md-end align-items-center item-status-menu">
+                                        <div class="d-flex justify-content-end align-items-center item-status-menu">
                                             {# 価格 , ステータス #}
                                             <span class="text-muted">¥{{ intent.product.price|intcomma }}</span>
                                             <span class="status-badge {{ intent.product.status_class }}">{{ intent.product.get_status_display }}</span>
